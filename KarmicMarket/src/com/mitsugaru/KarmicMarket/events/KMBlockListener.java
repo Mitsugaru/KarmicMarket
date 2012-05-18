@@ -53,19 +53,20 @@ public class KMBlockListener implements Listener
 										+ " No market specified!");
 						event.setCancelled(true);
 					}
+					// Reformat sign
+					event.setLine(0, marketName);
+					event.setLine(1, KarmicMarket.TAG);
+					event.setLine(2, "Package:");
+					// TODO get the market's first package if it has any
+					event.setLine(3, "");
 					// check if there's a chest, if enabled in config
+
 					if (plugin.getPluginConfig().needsChest)
 					{
 						// Thanks to Wolvereness for the following code
 						if (event.getBlock().getRelative(BlockFace.DOWN)
 								.getType().equals(Material.CHEST))
 						{
-							// Reformat sign
-							event.setLine(0, marketName);
-							event.setLine(1, ChatColor.AQUA + "[KarmicMarket]");
-							event.setLine(2, "Package:");
-							// TODO get the market's first package if it has any
-							event.setLine(3, "");
 							event.getPlayer().sendMessage(
 									ChatColor.GREEN
 											+ KarmicMarket.TAG
@@ -76,13 +77,7 @@ public class KMBlockListener implements Listener
 						}
 						else
 						{
-							// Reformat sign
-							event.setLine(0, marketName);
-							event.setLine(1, ChatColor.DARK_RED
-									+ "[KarmicMarket]");
-							event.setLine(2, "Package:");
-							// TODO get the market's first package if it has any
-							event.setLine(3, "");
+
 							event.getPlayer().sendMessage(
 									ChatColor.YELLOW + KarmicMarket.TAG
 											+ " No chest found!");
@@ -90,12 +85,6 @@ public class KMBlockListener implements Listener
 					}
 					else
 					{
-						// Reformat sign
-						event.setLine(0, marketName);
-						event.setLine(1, ChatColor.AQUA + "[KarmicMarket]");
-						event.setLine(2, "Page:");
-						// TODO get the market's first package if it has any
-						event.setLine(3, "");
 						event.getPlayer().sendMessage(
 								ChatColor.GREEN
 										+ KarmicMarket.TAG
@@ -176,7 +165,7 @@ public class KMBlockListener implements Listener
 					if (has)
 					{
 						// Reformat sign
-						sign.setLine(1, ChatColor.AQUA + KarmicMarket.TAG);
+						sign.setLine(1, KarmicMarket.TAG);
 						sign.setLine(2, "Package:");
 						// TODO get the market's first package if it has any
 						sign.setLine(3, "");
@@ -211,7 +200,7 @@ public class KMBlockListener implements Listener
 						if (exists)
 						{
 							// Reformat sign
-							sign.setLine(1, ChatColor.AQUA + KarmicMarket.TAG);
+							sign.setLine(1, KarmicMarket.TAG);
 							sign.setLine(2, "Package:");
 							// TODO get the market's first package if it has any
 							sign.setLine(3, "");
@@ -254,7 +243,7 @@ public class KMBlockListener implements Listener
 						chest.getInventory().clear();
 						chest.update();
 						// Update sign
-						sign.setLine(1, ChatColor.DARK_RED + KarmicMarket.TAG);
+						sign.setLine(1, KarmicMarket.TAG);
 						sign.update();
 						event.getPlayer().sendMessage(
 								ChatColor.YELLOW
@@ -277,7 +266,8 @@ public class KMBlockListener implements Listener
 					{
 						// Is our sign
 						if (plugin.getPermissionsHandler().checkPermission(
-								event.getPlayer(), PermissionNode.SIGN.getNode()))
+								event.getPlayer(),
+								PermissionNode.SIGN.getNode()))
 						{
 							event.getPlayer().sendMessage(
 									ChatColor.YELLOW

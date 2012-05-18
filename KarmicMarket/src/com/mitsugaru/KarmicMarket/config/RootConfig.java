@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -28,9 +29,19 @@ public class RootConfig
 		defaults.put("debug.economy", false);
 		defaults.put("debug.time", false);
 		defaults.put("version", plugin.getDescription().getVersion());
-		//Load settings
+		// Insert defaults into config file if they're not present
+		for (final Entry<String, Object> e : defaults.entrySet())
+		{
+			if (!config.contains(e.getKey()))
+			{
+				config.set(e.getKey(), e.getValue());
+			}
+		}
+		// Save config
+		plugin.saveConfig();
+		// Load settings
 		loadSettings(config);
-		//load packages
+		// load packages
 		loadPackages();
 	}
 
@@ -48,7 +59,7 @@ public class RootConfig
 			if (file.isFile())
 			{
 				PackageConfig pack = new PackageConfig(file);
-				if(!pack.isEmpty())
+				if (!pack.isEmpty())
 				{
 					packages.add(pack);
 				}
@@ -62,16 +73,16 @@ public class RootConfig
 		plugin.reloadConfig();
 		// Grab config
 		final ConfigurationSection config = plugin.getConfig();
-		//Load settings
+		// Load settings
 		loadSettings(config);
-		//TODO close all open inventories
-		//Clear set of current packages
+		// TODO close all open inventories
+		// Clear set of current packages
 		packages.clear();
-		//Load packages
+		// Load packages
 		loadPackages();
 		plugin.getLogger().info("Config reloaded");
 	}
-	
+
 	private void loadSettings(ConfigurationSection config)
 	{
 		needsChest = config.getBoolean("needsChest", true);

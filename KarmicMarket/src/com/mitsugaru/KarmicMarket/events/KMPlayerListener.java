@@ -14,6 +14,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.Inventory;
 
 import com.mitsugaru.KarmicMarket.KarmicMarket;
 import com.mitsugaru.KarmicMarket.inventory.MarketInfo;
@@ -33,7 +34,7 @@ public class KMPlayerListener implements Listener
 	public void onPlayerInteract(PlayerInteractEvent event)
 	{
 		// Grab type of click
-		boolean right, left = false;
+		boolean right = false, left = false;
 		if (event.getAction() == Action.RIGHT_CLICK_BLOCK)
 		{
 			right = true;
@@ -55,9 +56,18 @@ public class KMPlayerListener implements Listener
 				{
 					// Assume activated
 					// TODO check if they have permission
-					// Show inventory
-					showMarketInventory(event.getPlayer(), sign);
-					// Make holder, if one does not already exist
+					if (left)
+					{
+						// TODO cycle
+					}
+					else if (right)
+					{
+						// Stop them from opening the chest since we have our
+						// own inventory to show
+						event.setCancelled(true);
+						// Show inventory
+						showMarketInventory(event.getPlayer(), sign);
+					}
 				}
 			}
 		}
@@ -73,8 +83,19 @@ public class KMPlayerListener implements Listener
 				if (signIsActivated(sign))
 				{
 					// TODO check if they have permission
-					// Show inventory
-					showMarketInventory(event.getPlayer(), sign);
+					// Show inventory IF chests are disabled
+					if (right)
+					{
+						if (!plugin.getPluginConfig().needsChest)
+						{
+							showMarketInventory(event.getPlayer(), sign);
+						}
+						else
+						{
+							// TODO cycle
+						}
+
+					}
 				}
 				else
 				{
@@ -97,7 +118,12 @@ public class KMPlayerListener implements Listener
 		if (openMarkets.containsKey(market))
 		{
 			// Show the existing inventory to that player
-			player.openInventory(openMarkets.get(market).getInventory());
+			final int id = plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new DelayInventoryOpen(player, openMarkets.get(market).getInventory()), 1);
+			if(id == -1)
+			{
+				plugin.getLogger().warning("Could not open market inventory!");
+				player.sendMessage(ChatColor.RED + KarmicMarket.TAG + " Could not open market inventory!");
+			}
 		}
 		else
 		{
@@ -106,21 +132,47 @@ public class KMPlayerListener implements Listener
 					market);
 			holder.setInventory(plugin.getServer().createInventory(holder, 54,
 					marketName + " - " + packageName));
-			player.openInventory(holder.getInventory());
+			final int id = plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new DelayInventoryOpen(player, holder.getInventory()), 1);
+			if(id == -1)
+			{
+				plugin.getLogger().warning("Could not open market inventory!");
+				player.sendMessage(ChatColor.RED + KarmicMarket.TAG + " Could not open market inventory!");
+			}
 		}
 	}
 
 	private boolean signIsActivated(final Sign sign)
 	{
 		final String tag = sign.getLine(1);
-		if (tag.contains(ChatColor.DARK_RED + ""))
+		// TODO replace with chest checking, if necessary. This is because the
+		// extra chat color doesn't work with the long tag
+		/*if (tag.contains(ChatColor.DARK_RED + ""))
 		{
 			return false;
 		}
 		else if (tag.contains(ChatColor.AQUA + ""))
 		{
 			return true;
+		}*/
+		return true;
+	}
+
+	private class DelayInventoryOpen implements Runnable
+	{
+		private final Player player;
+		private final Inventory inventory;
+
+		public DelayInventoryOpen(Player player, Inventory inventory)
+		{
+			this.player = player;
+			this.inventory = inventory;
 		}
-		return false;
+
+		@Override
+		public void run()
+		{
+			player.closeInventory();
+			player.openInventory(inventory);
+		}
 	}
 }

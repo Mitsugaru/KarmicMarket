@@ -51,7 +51,7 @@ public class KMInventoryListener implements Listener
 			final MarketInventoryHolder holder = instanceCheck(event);
 			if(holder != null)
 			{
-				boolean left, right, shift = false;
+				boolean left = false, right = false, shift = false;
 				if(event.isLeftClick())
 				{
 					left = true;

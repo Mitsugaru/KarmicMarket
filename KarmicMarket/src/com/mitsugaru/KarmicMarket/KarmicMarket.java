@@ -44,7 +44,7 @@ public class KarmicMarket extends JavaPlugin
 			pm.disablePlugin(this);
 		}
 		// Setup commander
-		this.getCommand("km").setExecutor(new Commander(this));
+		getCommand("km").setExecutor(new Commander(this));
 		// Setup listeners
 		pm.registerEvents(new KMBlockListener(this), this);
 		pm.registerEvents(new KMEntityListener(this), this);
