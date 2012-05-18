@@ -1,0 +1,24 @@
+name: KarmicMarket
+main: com.mitsugaru.KarmicMarket.KarmicMarket
+version: 0.01
+website: http://dev.bukkit.org/server-mods/karmicmarket
+description: Visual, multi-market system with custom item packages.
+authors:
+  - Mitsugaru
+depend: [Vault]
+softdepend: [PlayerPoints]
+commands:
+    kr:
+        description: Root command for KarmicMarket
+        usage: /kr ? - Show help on KarmicMarket
+permissions:
+    KarmicMarket.*:
+        description: Gives access to all KarmicMarket permission nodes
+        children:
+            KarmicMarket.admin: true
+    KarmicMarket.admin:
+        description: Administrate the plugin
+        default: op
+    KarmicMarket.sign:
+        description: Ability to make market signs
+        default: op
