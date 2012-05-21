@@ -75,6 +75,11 @@ public class PackageConfig
 	{
 		return packageName;
 	}
+	
+	public Map<Item, KMInfo> getItems()
+	{
+		return items;
+	}
 
 	private void loadDefaults()
 	{

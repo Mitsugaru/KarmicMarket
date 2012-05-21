@@ -14,7 +14,7 @@ import com.mitsugaru.KarmicMarket.KarmicMarket;
 public class RootConfig
 {
 	private KarmicMarket plugin;
-	private final Map<String, PackageConfig> packages = new HashMap<String, PackageConfig>();
+	private static final Map<String, PackageConfig> packages = new HashMap<String, PackageConfig>();
 	private final Map<String, MarketConfig> markets = new HashMap<String, MarketConfig>();
 	public boolean debugTime, debugEconomy, needsChest;
 
@@ -152,7 +152,7 @@ public class RootConfig
 		return null;
 	}
 
-	public PackageConfig getPackageConfig(String name)
+	public static PackageConfig getPackageConfig(String name)
 	{
 		for(String p : packages.keySet())
 		{
