@@ -84,7 +84,7 @@ public class Commander implements CommandExecutor
 		{
 			try
 			{
-				final String marketName = args[2];
+				final String marketName = args[1];
 				if (!marketName.matches(MARKET_NAME_REGEX))
 				{
 					sender.sendMessage(ChatColor.RED + KarmicMarket.TAG
