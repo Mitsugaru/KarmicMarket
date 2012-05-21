@@ -63,6 +63,20 @@ public class MarketConfig
 				config.set(entry.getKey(), entry.getValue());
 			}
 		}
+		save();
+	}
+	
+	public void save()
+	{
+		try
+		{
+			config.save(file);
+		}
+		catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void reload()

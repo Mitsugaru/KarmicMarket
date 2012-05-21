@@ -46,11 +46,11 @@ public class Commander implements CommandExecutor
 			if (com.equals("version") || com.equals("ver"))
 			{
 				// Version and author
-				this.showVersion(sender, args);
+				return showVersion(sender, args);
 			}
 			else if (com.equals("?") || com.equals("help"))
 			{
-				this.displayHelp(sender);
+				return displayHelp(sender);
 			}
 			else if (com.equals("reload"))
 			{
@@ -58,6 +58,7 @@ public class Commander implements CommandExecutor
 				{
 					config.reloadConfig();
 				}
+				return true;
 			}
 			else if (com.equals("create"))
 			{
@@ -138,7 +139,7 @@ public class Commander implements CommandExecutor
 		return true;
 	}
 
-	private void showVersion(CommandSender sender, String[] args)
+	private boolean showVersion(CommandSender sender, String[] args)
 	{
 		sender.sendMessage(ChatColor.BLUE + bar + "=====");
 		sender.sendMessage(ChatColor.GREEN + "KarmicMarket v"
@@ -149,6 +150,7 @@ public class Commander implements CommandExecutor
 		if (config.debugTime)
 			sender.sendMessage(ChatColor.GRAY + "Debug time: "
 					+ config.debugTime);
+		return true;
 	}
 
 	/**
@@ -157,10 +159,11 @@ public class Commander implements CommandExecutor
 	 * @param sender
 	 *            to display to
 	 */
-	private void displayHelp(CommandSender sender)
+	private boolean displayHelp(CommandSender sender)
 	{
 		sender.sendMessage(ChatColor.WHITE + "==========" + ChatColor.GOLD
 				+ "KarmicMarket" + ChatColor.WHITE + "==========");
+		return true;
 	}
 
 	private void debugTime(CommandSender sender, long time)

@@ -42,6 +42,19 @@ public class PackageConfig
 			ia.printStackTrace();
 		}
 	}
+	
+	public void save()
+	{
+		try
+		{
+			config.save(file);
+		}
+		catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	public void reload()
 	{
@@ -95,6 +108,7 @@ public class PackageConfig
 				config.set(entry.getKey(), entry.getValue());
 			}
 		}
+		save();
 	}
 
 	private void loadSettings()

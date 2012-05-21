@@ -10,7 +10,7 @@ softdepend: [PlayerPoints]
 commands:
     km:
         description: Root command for KarmicMarket
-        usage: /kr ? - Show help on KarmicMarket
+        usage: /km ? - Show help on KarmicMarket
 permissions:
     KarmicMarket.*:
         description: Gives access to all KarmicMarket permission nodes
