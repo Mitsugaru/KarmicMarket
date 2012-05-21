@@ -16,9 +16,13 @@ permissions:
         description: Gives access to all KarmicMarket permission nodes
         children:
             KarmicMarket.admin: true
+            KarmicMarket.sign: true
     KarmicMarket.admin:
         description: Administrate the plugin
         default: op
     KarmicMarket.sign:
+        description: Ability to make market signs
+        default: op
+    KarmicMarket.market.create:
         description: Ability to make market signs
         default: op

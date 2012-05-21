@@ -16,6 +16,7 @@ public class Commander implements CommandExecutor
 	private final RootConfig config;
 	private final PermCheck perm;
 	private final static String bar = "======================";
+	private static final String MARKET_NAME_REGEX = "[\\p{Alnum}_[\\-]]*";
 	private long time = 0;
 
 	public Commander(KarmicMarket plugin)
@@ -26,8 +27,8 @@ public class Commander implements CommandExecutor
 	}
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel,
-			String[] args)
+	public boolean onCommand(CommandSender sender, Command cmd,
+			String commandLabel, String[] args)
 	{
 		if (config.debugTime)
 		{
@@ -51,12 +52,22 @@ public class Commander implements CommandExecutor
 			{
 				this.displayHelp(sender);
 			}
-			else if(com.equals("reload"))
+			else if (com.equals("reload"))
 			{
-				if(perm.checkPermission(sender, PermissionNode.ADMIN))
+				if (perm.checkPermission(sender, PermissionNode.ADMIN))
 				{
 					config.reloadConfig();
 				}
+			}
+			else if (com.equals("create"))
+			{
+				return createMarketCommand(sender, args);
+			}
+			else
+			{
+				sender.sendMessage(ChatColor.RED + KarmicMarket.TAG
+						+ " Unknown command '" + ChatColor.AQUA + com
+						+ ChatColor.RED + "'");
 			}
 		}
 		if (config.debugTime)
@@ -66,6 +77,67 @@ public class Commander implements CommandExecutor
 		return false;
 	}
 	
+	private boolean createMarketCommand(CommandSender sender, String[] args)
+	{
+		if (perm.checkPermission(sender, PermissionNode.MARKET_CREATE))
+		{
+			try
+			{
+				final String marketName = args[2];
+				if (!marketName.matches(MARKET_NAME_REGEX))
+				{
+					sender.sendMessage(ChatColor.RED + KarmicMarket.TAG
+							+ " Market name must be alphanumeric.");
+				}
+				else if (marketName.length() > 15)
+				{
+					// Restrict length to sign character limit
+					sender.sendMessage(ChatColor.RED
+							+ KarmicMarket.TAG
+							+ " Market name must be 15 characters or less.");
+				}
+				else
+				{
+					if (config.marketExists(marketName))
+					{
+						sender.sendMessage(ChatColor.RED
+								+ KarmicMarket.TAG + " Market '"
+								+ ChatColor.GOLD + marketName
+								+ ChatColor.RED + "' already exists.");
+						return true;
+					}
+					if (config.createMarket(marketName))
+					{
+						sender.sendMessage(ChatColor.GREEN
+								+ KarmicMarket.TAG + " Market '"
+								+ ChatColor.GOLD + marketName
+								+ ChatColor.GREEN + "' created.");
+					}
+					else
+					{
+						sender.sendMessage(ChatColor.RED
+								+ KarmicMarket.TAG + " Market '"
+								+ ChatColor.GOLD + marketName
+								+ ChatColor.RED
+								+ "' could not be created!");
+					}
+				}
+			}
+			catch (ArrayIndexOutOfBoundsException aioob)
+			{
+				sender.sendMessage(ChatColor.RED + KarmicMarket.TAG
+						+ " Market name not given.");
+			}
+		}
+		else
+		{
+			sender.sendMessage(ChatColor.RED + KarmicMarket.TAG
+					+ " Lack Permission: "
+					+ PermissionNode.MARKET_CREATE.getNode());
+		}
+		return true;
+	}
+
 	private void showVersion(CommandSender sender, String[] args)
 	{
 		sender.sendMessage(ChatColor.BLUE + bar + "=====");
@@ -74,11 +146,11 @@ public class Commander implements CommandExecutor
 		sender.sendMessage(ChatColor.GREEN + "Coded by Mitsugaru");
 		sender.sendMessage(ChatColor.BLUE + "===========" + ChatColor.GRAY
 				+ "Config" + ChatColor.BLUE + "===========");
-		if(config.debugTime)
-			sender.sendMessage(ChatColor.GRAY + "Debug time: " + config.debugTime);
+		if (config.debugTime)
+			sender.sendMessage(ChatColor.GRAY + "Debug time: "
+					+ config.debugTime);
 	}
-	
-	
+
 	/**
 	 * Show the help menu, with commands and description
 	 * 
@@ -90,7 +162,7 @@ public class Commander implements CommandExecutor
 		sender.sendMessage(ChatColor.WHITE + "==========" + ChatColor.GOLD
 				+ "KarmicMarket" + ChatColor.WHITE + "==========");
 	}
-	
+
 	private void debugTime(CommandSender sender, long time)
 	{
 		time = System.nanoTime() - time;

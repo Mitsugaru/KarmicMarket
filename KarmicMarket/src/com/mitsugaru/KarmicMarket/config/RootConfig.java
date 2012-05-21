@@ -1,10 +1,10 @@
 package com.mitsugaru.KarmicMarket.config;
 
 import java.io.File;
-import java.util.HashSet;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -14,7 +14,8 @@ import com.mitsugaru.KarmicMarket.KarmicMarket;
 public class RootConfig
 {
 	private KarmicMarket plugin;
-	private final Set<PackageConfig> packages = new HashSet<PackageConfig>();
+	private final Map<String, PackageConfig> packages = new HashMap<String, PackageConfig>();
+	private final Map<String, MarketConfig> markets = new HashMap<String, MarketConfig>();
 	public boolean debugTime, debugEconomy, needsChest;
 
 	public RootConfig(KarmicMarket plugin)
@@ -43,27 +44,72 @@ public class RootConfig
 		loadSettings(config);
 		// load packages
 		loadPackages();
+		loadMarkets();
 	}
 
 	private void loadPackages()
 	{
-		final File directory = new File(plugin.getDataFolder()
-				.getAbsolutePath() + "/packages");
-		if (!directory.exists())
+		try
 		{
-			directory.mkdir();
-		}
-		// Grab all files
-		for (final File file : directory.listFiles())
-		{
-			if (file.isFile())
+			final File directory = new File(plugin.getDataFolder()
+					.getAbsolutePath() + "/packages");
+			if (!directory.exists())
 			{
-				PackageConfig pack = new PackageConfig(file);
-				if (!pack.isEmpty())
+				directory.mkdir();
+			}
+			// Grab all files
+			for (final File file : directory.listFiles())
+			{
+				if (file.isFile())
 				{
-					packages.add(pack);
+					PackageConfig pack = new PackageConfig(file);
+					if (!pack.isEmpty())
+					{
+						packages.put(pack.getName(), pack);
+					}
+					else
+					{
+						// notify
+						plugin.getLogger()
+								.warning(
+										"Package file '"
+												+ file.getName()
+												+ "' appears to be empty? Not added...");
+					}
 				}
 			}
+		}
+		catch (SecurityException s)
+		{
+			plugin.getLogger().warning("Cannot access packages folder/files!");
+			s.printStackTrace();
+		}
+	}
+
+	private void loadMarkets()
+	{
+		try
+		{
+			final File directory = new File(plugin.getDataFolder()
+					.getAbsolutePath() + "/shops");
+			if (!directory.exists())
+			{
+				directory.mkdir();
+			}
+			// Grab all files
+			for (final File file : directory.listFiles())
+			{
+				if (file.isFile())
+				{
+					final MarketConfig market = new MarketConfig(file);
+					markets.put(market.getName(), market);
+				}
+			}
+		}
+		catch (SecurityException s)
+		{
+			plugin.getLogger().warning("Cannot access shops folder/files!");
+			s.printStackTrace();
 		}
 	}
 
@@ -80,6 +126,10 @@ public class RootConfig
 		packages.clear();
 		// Load packages
 		loadPackages();
+		// Clear set of current markets
+		markets.clear();
+		// load markets
+		loadMarkets();
 		plugin.getLogger().info("Config reloaded");
 	}
 
@@ -88,5 +138,64 @@ public class RootConfig
 		needsChest = config.getBoolean("needsChest", true);
 		debugTime = config.getBoolean("debug.time", false);
 		debugEconomy = config.getBoolean("debug.economy", false);
+	}
+
+	public MarketConfig getMarketConfig(String name)
+	{
+		for(String market : markets.keySet())
+		{
+			if(market.equalsIgnoreCase(name))
+			{
+				return markets.get(market);
+			}
+		}
+		return null;
+	}
+
+	public PackageConfig getPackageConfig(String name)
+	{
+		for(String p : packages.keySet())
+		{
+			if(p.equalsIgnoreCase(name))
+			{
+				return packages.get(p);
+			}
+		}
+		return packages.get(name);
+	}
+
+	public boolean createMarket(String name)
+	{
+		boolean created = false;
+		final File market = new File(plugin.getDataFolder().getAbsolutePath()
+				+ "/shops/" + name + ".yml");
+		try
+		{
+			// Attempt to create file
+			if (market.createNewFile())
+			{
+				final MarketConfig marketConfig = new MarketConfig(market);
+				markets.put(marketConfig.getName(), marketConfig);
+				created = true;
+			}
+		}
+		catch (IOException io)
+		{
+			// TODO notify
+			io.printStackTrace();
+		}
+		return created;
+	}
+	
+	public boolean marketExists(String name)
+	{
+		for(String market : markets.keySet())
+		{
+			if(market.equalsIgnoreCase(name))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 }
