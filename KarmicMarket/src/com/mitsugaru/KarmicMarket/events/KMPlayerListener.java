@@ -101,6 +101,7 @@ public class KMPlayerListener implements Listener
 						else
 						{
 							showMarketInventory(event.getPlayer(), sign);
+							event.setCancelled(true);
 						}
 					}
 					else
@@ -127,6 +128,10 @@ public class KMPlayerListener implements Listener
 		// Grab config
 		final MarketConfig marketConfig = plugin.getPluginConfig()
 				.getMarketConfig(marketName);
+		if(marketConfig == null)
+		{
+			return;
+		}
 		// Check if the market has no packages
 		if (marketConfig.isEmpty())
 		{
@@ -232,7 +237,6 @@ public class KMPlayerListener implements Listener
 
 	private boolean signIsActivated(final Sign sign)
 	{
-		final String tag = sign.getLine(1);
 		if (plugin.getPluginConfig().needsChest)
 		{
 			if (!sign.getBlock().getRelative(BlockFace.DOWN).getType()
@@ -259,7 +263,19 @@ public class KMPlayerListener implements Listener
 		public void run()
 		{
 			player.closeInventory();
-			player.openInventory(inventory);
+			final int i = plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
+
+				@Override
+				public void run()
+				{
+					player.openInventory(inventory);
+				}
+				
+			}, 1);
+			if(i == -1)
+			{
+				player.sendMessage(ChatColor.RED + KarmicMarket.TAG + " Could not open market inventory!");
+			}
 		}
 	}
 }
