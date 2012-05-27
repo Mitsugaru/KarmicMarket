@@ -17,6 +17,7 @@ permissions:
         children:
             KarmicMarket.admin: true
             KarmicMarket.sign: true
+            KarmicMarket.market.create: true
     KarmicMarket.admin:
         description: Administrate the plugin
         default: op
