@@ -14,6 +14,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 
 import com.mitsugaru.KarmicMarket.KarmicMarket;
@@ -29,6 +30,13 @@ public class KMPlayerListener implements Listener
 	public KMPlayerListener(KarmicMarket plugin)
 	{
 		this.plugin = plugin;
+	}
+	
+	public void onPlayerQuit(final PlayerQuitEvent event)
+	{
+		// TODO player quit event, since that doesn't throw an inventory close
+		// event
+		// just to double check
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL)
@@ -128,7 +136,7 @@ public class KMPlayerListener implements Listener
 		// Grab config
 		final MarketConfig marketConfig = plugin.getPluginConfig()
 				.getMarketConfig(marketName);
-		if(marketConfig == null)
+		if (marketConfig == null)
 		{
 			return;
 		}
@@ -189,28 +197,17 @@ public class KMPlayerListener implements Listener
 		// Ignore if there is no package defined
 		if (packageName.equals(""))
 		{
-			//TODO nofity player
+			// TODO nofity player
 			return;
 		}
 		// Generate market info object
-		MarketInfo market = new MarketInfo(marketName, packageName);
+		final MarketInfo market = new MarketInfo(marketName, packageName);
 		// See if the market inventory is already open
+		Inventory inventory = null;
 		if (openMarkets.containsKey(market))
 		{
 			// Show the existing inventory to that player
-			final int id = plugin
-					.getServer()
-					.getScheduler()
-					.scheduleSyncDelayedTask(
-							plugin,
-							new DelayInventoryOpen(player, openMarkets.get(
-									market).getInventory()), 1);
-			if (id == -1)
-			{
-				plugin.getLogger().warning("Could not open market inventory!");
-				player.sendMessage(ChatColor.RED + KarmicMarket.TAG
-						+ " Could not open market inventory!");
-			}
+			inventory = openMarkets.get(market).getInventory();
 		}
 		else
 		{
@@ -219,19 +216,18 @@ public class KMPlayerListener implements Listener
 					market);
 			holder.setInventory(plugin.getServer().createInventory(holder, 54,
 					marketName + " - " + packageName));
-			final int id = plugin
-					.getServer()
-					.getScheduler()
-					.scheduleSyncDelayedTask(
-							plugin,
-							new DelayInventoryOpen(player, holder
-									.getInventory()), 1);
-			if (id == -1)
-			{
-				plugin.getLogger().warning("Could not open market inventory!");
-				player.sendMessage(ChatColor.RED + KarmicMarket.TAG
-						+ " Could not open market inventory!");
-			}
+			inventory = holder.getInventory();
+		}
+		final int id = plugin
+				.getServer()
+				.getScheduler()
+				.scheduleSyncDelayedTask(plugin,
+						new DelayInventoryOpen(player, inventory), 1);
+		if (id == -1)
+		{
+			plugin.getLogger().warning("Could not open market inventory!");
+			player.sendMessage(ChatColor.RED + KarmicMarket.TAG
+					+ " Could not open market inventory!");
 		}
 	}
 
@@ -263,18 +259,20 @@ public class KMPlayerListener implements Listener
 		public void run()
 		{
 			player.closeInventory();
-			final int i = plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
+			final int i = plugin.getServer().getScheduler()
+					.scheduleSyncDelayedTask(plugin, new Runnable() {
 
-				@Override
-				public void run()
-				{
-					player.openInventory(inventory);
-				}
-				
-			}, 1);
-			if(i == -1)
+						@Override
+						public void run()
+						{
+							player.openInventory(inventory);
+						}
+
+					}, 1);
+			if (i == -1)
 			{
-				player.sendMessage(ChatColor.RED + KarmicMarket.TAG + " Could not open market inventory!");
+				player.sendMessage(ChatColor.RED + KarmicMarket.TAG
+						+ " Could not open market inventory!");
 			}
 		}
 	}
