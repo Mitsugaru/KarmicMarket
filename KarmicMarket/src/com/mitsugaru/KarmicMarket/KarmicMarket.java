@@ -24,7 +24,6 @@ public class KarmicMarket extends JavaPlugin
 		this.reloadConfig();
 		this.saveConfig();
 		// TODO Disconnect from sql database
-		
 	}
 	@Override
 	public void onEnable()
