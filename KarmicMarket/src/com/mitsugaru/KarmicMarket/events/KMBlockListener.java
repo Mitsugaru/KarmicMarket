@@ -266,7 +266,7 @@ public class KMBlockListener implements Listener
 							KarmicMarket.TAG))
 					{
 						// Is our sign
-						if (PermissionHandler.checkPermission(
+						if (PermissionHandler.has(
 								event.getPlayer(),
 								PermissionNode.SIGN.getNode()))
 						{
