@@ -15,14 +15,14 @@ import com.mitsugaru.KarmicMarket.KarmicMarket;
  * @author Mitsugaru
  *
  */
-public class PermCheck {
-	private Permission perm;
-	private boolean hasVault;
+public class PermissionHandler {
+	private static Permission perm;
+	private static boolean hasVault;
 
 	/**
 	 * Constructor
 	 */
-	public PermCheck(KarmicMarket plugin)
+	public static void init(KarmicMarket plugin)
 	{
 		if(plugin.getServer().getPluginManager().getPlugin("Vault") != null)
 		{
@@ -43,9 +43,9 @@ public class PermCheck {
 
 	}
 	
-	public boolean checkPermission(CommandSender sender, PermissionNode node)
+	public static boolean has(CommandSender sender, PermissionNode node)
 	{
-		return checkPermission(sender, node.getNode());
+		return has(sender, node.getNode());
 	}
 
 	/**
@@ -54,14 +54,13 @@ public class PermCheck {
 	 * @param Permission node to check, as String
 	 * @return true if sender has the node, else false
 	 */
-	public boolean checkPermission(CommandSender sender, String node)
+	public static boolean has(CommandSender sender, String node)
 	{
 		//Use vault if we have it
 		if(hasVault && perm != null)
 		{
 			return perm.has(sender, node);
 		}
-		//If not using PEX / Vault, OR if sender is not a player (in PEX only case)
 		//Attempt to use SuperPerms or op
 		if(sender.isOp() || sender.hasPermission(node))
 		{

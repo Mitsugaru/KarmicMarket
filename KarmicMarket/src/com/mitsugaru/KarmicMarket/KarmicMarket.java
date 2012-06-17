@@ -9,14 +9,13 @@ import com.mitsugaru.KarmicMarket.events.KMEntityListener;
 import com.mitsugaru.KarmicMarket.events.KMInventoryListener;
 import com.mitsugaru.KarmicMarket.events.KMPlayerListener;
 import com.mitsugaru.KarmicMarket.logic.EconomyLogic;
-import com.mitsugaru.KarmicMarket.permissions.PermCheck;
+import com.mitsugaru.KarmicMarket.permissions.PermissionHandler;
 
 public class KarmicMarket extends JavaPlugin
 {
 	//Class variables
 	public static final String TAG = "[KarmicMarket]";
 	private RootConfig config;
-	private PermCheck perm;
 	
 	@Override
 	public void onDisable()
@@ -31,7 +30,7 @@ public class KarmicMarket extends JavaPlugin
 		// Get config
 		config = new RootConfig(this);
 		// Get permissions
-		perm = new PermCheck(this);
+		PermissionHandler.init(this);
 		//Get pllugin manager
 		final PluginManager pm = this.getServer().getPluginManager();
 		// Setup economy
@@ -54,9 +53,5 @@ public class KarmicMarket extends JavaPlugin
 	public RootConfig getPluginConfig()
 	{
 		return config;
-	}
-	public PermCheck getPermissionsHandler()
-	{
-		return perm;
 	}
 }

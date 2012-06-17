@@ -14,6 +14,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 
 import com.mitsugaru.KarmicMarket.KarmicMarket;
+import com.mitsugaru.KarmicMarket.permissions.PermissionHandler;
 import com.mitsugaru.KarmicMarket.permissions.PermissionNode;
 import com.splatbang.betterchest.BetterChest;
 
@@ -36,7 +37,7 @@ public class KMBlockListener implements Listener
 			if (ChatColor.stripColor(event.getLine(1)).equalsIgnoreCase(
 					KarmicMarket.TAG))
 			{
-				if (plugin.getPermissionsHandler().checkPermission(
+				if (PermissionHandler.has(
 						event.getPlayer(), PermissionNode.SIGN))
 				{
 					String marketName = null;
@@ -265,7 +266,7 @@ public class KMBlockListener implements Listener
 							KarmicMarket.TAG))
 					{
 						// Is our sign
-						if (plugin.getPermissionsHandler().checkPermission(
+						if (PermissionHandler.checkPermission(
 								event.getPlayer(),
 								PermissionNode.SIGN.getNode()))
 						{

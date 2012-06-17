@@ -6,7 +6,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import com.mitsugaru.KarmicMarket.config.RootConfig;
-import com.mitsugaru.KarmicMarket.permissions.PermCheck;
+import com.mitsugaru.KarmicMarket.permissions.PermissionHandler;
 import com.mitsugaru.KarmicMarket.permissions.PermissionNode;
 
 public class Commander implements CommandExecutor
@@ -14,7 +14,6 @@ public class Commander implements CommandExecutor
 	// Class variables
 	private final KarmicMarket plugin;
 	private final RootConfig config;
-	private final PermCheck perm;
 	private final static String bar = "======================";
 	private static final String MARKET_NAME_REGEX = "[\\p{Alnum}_[\\-]]*";
 	private long time = 0;
@@ -23,7 +22,6 @@ public class Commander implements CommandExecutor
 	{
 		this.plugin = plugin;
 		this.config = plugin.getPluginConfig();
-		this.perm = plugin.getPermissionsHandler();
 	}
 
 	@Override
@@ -54,7 +52,7 @@ public class Commander implements CommandExecutor
 			}
 			else if (com.equals("reload"))
 			{
-				if (perm.checkPermission(sender, PermissionNode.ADMIN))
+				if (PermissionHandler.has(sender, PermissionNode.ADMIN))
 				{
 					config.reloadConfig();
 				}
@@ -80,7 +78,7 @@ public class Commander implements CommandExecutor
 	
 	private boolean createMarketCommand(CommandSender sender, String[] args)
 	{
-		if (perm.checkPermission(sender, PermissionNode.MARKET_CREATE))
+		if (PermissionHandler.has(sender, PermissionNode.MARKET_CREATE))
 		{
 			try
 			{
