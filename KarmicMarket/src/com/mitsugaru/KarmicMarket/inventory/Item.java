@@ -216,6 +216,10 @@ public class Item extends MaterialData
 	 */
 	public static String getItemEnchantments(ItemStack item)
 	{
+		if(item.getEnchantments().isEmpty())
+		{
+			return "";
+		}
 		final StringBuilder sb = new StringBuilder();
 		final Map<ComparableEnchantment, Integer> map = new HashMap<ComparableEnchantment, Integer>();
 		for (Map.Entry<Enchantment, Integer> entry : item.getEnchantments()
@@ -285,16 +289,6 @@ public class Item extends MaterialData
 	public int getId()
 	{
 		return this.getItemType().getId();
-	}
-
-	/**
-	 * Grabs the data value of this Item object
-	 * 
-	 * @return data value
-	 */
-	public byte getData()
-	{
-		return this.getData();
 	}
 
 	/**
