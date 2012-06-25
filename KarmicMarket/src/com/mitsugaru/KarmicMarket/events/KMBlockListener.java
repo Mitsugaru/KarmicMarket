@@ -1,5 +1,7 @@
 package com.mitsugaru.KarmicMarket.events;
 
+import java.util.Set;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -73,14 +75,20 @@ public class KMBlockListener implements Listener
 			event.setCancelled(true);
 			return;
 		}
+		// get the market's first package if it has any
+		final Set<String> packages = plugin.getRootConfig()
+				.getMarketConfig(marketName).getPackageSet();
+		String firstPackage = "";
+		if (!packages.isEmpty())
+		{
+			firstPackage = packages.toArray(new String[0])[0];
+		}
 		// Reformat sign
 		event.setLine(0, marketName);
 		event.setLine(1, KarmicMarket.TAG);
 		event.setLine(2, "Package:");
-		// TODO get the market's first package if it has any
-		event.setLine(3, "");
+		event.setLine(3, firstPackage);
 		// check if there's a chest, if enabled in config
-
 		if (plugin.getRootConfig().needsChest)
 		{
 			// Thanks to Wolvereness for the following code
@@ -151,32 +159,16 @@ public class KMBlockListener implements Listener
 		{
 			final Block block = event.getBlock();
 			final BetterChest chest = new BetterChest((Chest) block.getState());
-
+			boolean has = false;
+			Sign sign = null;
 			if (block.getRelative(BlockFace.UP).getType() == Material.WALL_SIGN)
 			{
-				boolean has = false;
-				Sign sign = (Sign) block.getRelative(BlockFace.UP).getState();
+
+				sign = (Sign) block.getRelative(BlockFace.UP).getState();
 				if (ChatColor.stripColor(sign.getLine(1)).equalsIgnoreCase(
 						KarmicMarket.TAG))
 				{
 					has = true;
-				}
-				if (has)
-				{
-					// Reformat sign
-					sign.setLine(1, KarmicMarket.TAG);
-					sign.setLine(2, "Package:");
-					// TODO get the market's first package if it has any
-					sign.setLine(3, "");
-					sign.update();
-					event.getPlayer().sendMessage(
-							ChatColor.GREEN
-									+ KarmicMarket.TAG
-									+ " Chest linked to "
-									+ ChatColor.GRAY
-									+ ChatColor.stripColor(sign.getLine(0))
-											.toLowerCase());
-
 				}
 			}
 			else if (chest.isDoubleChest())
@@ -184,32 +176,40 @@ public class KMBlockListener implements Listener
 				if (chest.attachedBlock().getRelative(BlockFace.UP).getType()
 						.equals(Material.WALL_SIGN))
 				{
-					boolean exists = false;
-					final Sign sign = (Sign) chest.attachedBlock()
+					sign = (Sign) chest.attachedBlock()
 							.getRelative(BlockFace.UP).getState();
 					if (ChatColor.stripColor(sign.getLine(1)).equalsIgnoreCase(
 							KarmicMarket.TAG))
 					{
 						// Sign already exists
-						exists = true;
-					}
-					if (exists)
-					{
-						// Reformat sign
-						sign.setLine(1, KarmicMarket.TAG);
-						sign.setLine(2, "Package:");
-						// TODO get the market's first package if it has any
-						sign.setLine(3, "");
-						sign.update();
-						event.getPlayer().sendMessage(
-								ChatColor.GREEN
-										+ KarmicMarket.TAG
-										+ " Chest linked to "
-										+ ChatColor.GRAY
-										+ ChatColor.stripColor(sign.getLine(0))
-												.toLowerCase());
+						has = true;
 					}
 				}
+			}
+			if (has)
+			{
+				// get the market's first package if it has any
+				final Set<String> packages = plugin.getRootConfig()
+						.getMarketConfig(ChatColor.stripColor(sign.getLine(0)))
+						.getPackageSet();
+				String firstPackage = "";
+				if (!packages.isEmpty())
+				{
+					firstPackage = packages.toArray(new String[0])[0];
+				}
+				// Reformat sign
+				sign.setLine(1, KarmicMarket.TAG);
+				sign.setLine(2, "Package:");
+				sign.setLine(3, firstPackage);
+				sign.update();
+				event.getPlayer().sendMessage(
+						ChatColor.GREEN
+								+ KarmicMarket.TAG
+								+ " Chest linked to "
+								+ ChatColor.GRAY
+								+ ChatColor.stripColor(sign.getLine(0))
+										.toLowerCase());
+
 			}
 		}
 	}
@@ -232,9 +232,6 @@ public class KMBlockListener implements Listener
 				if (ChatColor.stripColor(sign.getLine(1)).equalsIgnoreCase(
 						KarmicMarket.TAG))
 				{
-					// Update sign
-					sign.setLine(1, KarmicMarket.TAG);
-					sign.update();
 					event.getPlayer().sendMessage(
 							ChatColor.YELLOW
 									+ KarmicMarket.TAG
