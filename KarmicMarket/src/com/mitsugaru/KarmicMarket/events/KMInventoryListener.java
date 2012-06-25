@@ -255,8 +255,11 @@ public class KMInventoryListener implements Listener
 					+ " No space available to purchase item...");
 			return;
 		}
-		// Cancel
-		event.setCancelled(true);
+		if (!toCursor)
+		{
+			// Cancel
+			event.setCancelled(true);
+		}
 		// Pay for item
 		EconomyLogic.pay(player, price);
 	}
