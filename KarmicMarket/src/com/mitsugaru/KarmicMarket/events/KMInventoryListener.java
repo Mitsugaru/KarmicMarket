@@ -85,7 +85,6 @@ public class KMInventoryListener implements Listener
 		// Handle shift click
 		if (event.isShiftClick())
 		{
-			plugin.getLogger().info("shift click");
 			if (event.getCurrentItem().getType().equals(Material.AIR))
 			{
 				return;
@@ -103,8 +102,8 @@ public class KMInventoryListener implements Listener
 		{
 			if (event.getCurrentItem().getType().equals(Material.AIR))
 			{
+				//TODO If they have an item in the cursor, attempt to sell?
 				event.setCancelled(true);
-				return;
 			}
 			else if (event.isLeftClick())
 			{
@@ -181,8 +180,10 @@ public class KMInventoryListener implements Listener
 		if (remaining.isEmpty())
 		{
 			// repopulate slot that they just took
-			final Repopulate task = new Repopulate(holder.getInventory(),
-					event.getCurrentItem());
+			final ItemStack restore = product.toItemStack();
+			restore.setAmount(event.getCurrentItem().getAmount());
+			final Repopulate task = new Repopulate(event.getInventory(),
+					restore);
 			final int id = plugin.getServer().getScheduler()
 					.scheduleSyncDelayedTask(plugin, task, 1);
 			if (id == -1)
