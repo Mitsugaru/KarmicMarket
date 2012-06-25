@@ -102,7 +102,7 @@ public class KMInventoryListener implements Listener
 		{
 			if (event.getCurrentItem().getType().equals(Material.AIR))
 			{
-				//TODO If they have an item in the cursor, attempt to sell?
+				// TODO If they have an item in the cursor, attempt to sell?
 				event.setCancelled(true);
 			}
 			else if (event.isLeftClick())
@@ -120,44 +120,67 @@ public class KMInventoryListener implements Listener
 	{
 		final MarketInventoryHolder holder = instanceCheck(event);
 		final Item product = new Item(event.getCurrentItem());
-		final double price = holder.getMarketInfo().getItems()
-				.get(event.getCurrentItem()).getAmount()
-				* -1;
 		final Player player = (Player) event.getWhoClicked();
+		double price = -1;
+		try
+		{
+			price *= holder.getMarketInfo().getItems()
+					.get(event.getCurrentItem()).getAmount();
+		}
+		catch (NullPointerException npe)
+		{
+			player.sendMessage(ChatColor.RED + KarmicMarket.TAG
+					+ " Something went wrong...");
+			event.setCancelled(true);
+			return;
+		}
 		if (toCursor)
 		{
+			boolean deny = false, finish = false;
 			// Check cursor if its the same
 			if (!event.getCursor().getType().equals(Material.AIR))
 			{
 				final Item cursor = new Item(event.getCursor());
 				if (product.areSame(cursor))
 				{
-					// check if they can pay
-					if (!EconomyLogic.denyPay(player, price))
-					{
-						// Pay for item
-						EconomyLogic.pay(player, price);
-						// Add to cursor
-						event.getCursor().setAmount(
-								event.getCursor().getAmount()
-										+ event.getCurrentItem().getAmount());
-						player.sendMessage(ChatColor.GREEN + KarmicMarket.TAG
-								+ " Bought " + ChatColor.AQUA
-								+ event.getCurrentItem().toString()
-								+ ChatColor.GREEN + " for " + ChatColor.GOLD
-								+ price * -1);
-					}
-					else
-					{
-						// denied
-						player.sendMessage(ChatColor.YELLOW + KarmicMarket.TAG
-								+ " Cannot pay " + ChatColor.GOLD + price * -1
-								+ ChatColor.YELLOW + " for " + ChatColor.AQUA
-								+ event.getCurrentItem().toString());
-					}
-					event.setCancelled(true);
-					return;
+					deny = true;
+					finish = true;
 				}
+			}
+			else
+			{
+				// let it go to their cursor
+				finish = true;
+			}
+			// check if they can pay
+			if (!EconomyLogic.denyPay(player, price))
+			{
+				// Pay for item
+				EconomyLogic.pay(player, price);
+				// Add to cursor
+				event.getCursor().setAmount(
+						event.getCursor().getAmount()
+								+ event.getCurrentItem().getAmount());
+				player.sendMessage(ChatColor.GREEN + KarmicMarket.TAG
+						+ " Bought " + ChatColor.AQUA
+						+ event.getCurrentItem().toString() + ChatColor.GREEN
+						+ " for " + ChatColor.GOLD + price * -1);
+			}
+			else
+			{
+				// denied
+				player.sendMessage(ChatColor.YELLOW + KarmicMarket.TAG
+						+ " Cannot pay " + ChatColor.GOLD + price * -1
+						+ ChatColor.YELLOW + " for " + ChatColor.AQUA
+						+ event.getCurrentItem().toString());
+			}
+			if (deny)
+			{
+				event.setCancelled(true);
+			}
+			if (finish)
+			{
+				return;
 			}
 			// Else, we handle it to go to their inventory
 		}
@@ -193,7 +216,7 @@ public class KMInventoryListener implements Listener
 						"Could not schedule repopulate task on buyItem for "
 								+ player.getName() + " on item "
 								+ event.getCurrentItem().toString());
-				player.sendMessage(ChatColor.YELLOW + KarmicMarket.TAG
+				player.sendMessage(ChatColor.RED + KarmicMarket.TAG
 						+ " Something went wrong...");
 			}
 			player.sendMessage(ChatColor.GREEN + KarmicMarket.TAG + " Bought "
@@ -202,7 +225,7 @@ public class KMInventoryListener implements Listener
 		}
 		else
 		{
-			
+
 			// notify that they have no space
 			player.sendMessage(ChatColor.YELLOW + KarmicMarket.TAG
 					+ " No space available to purchase item...");
