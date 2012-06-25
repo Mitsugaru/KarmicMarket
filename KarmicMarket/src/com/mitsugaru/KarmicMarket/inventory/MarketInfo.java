@@ -6,13 +6,12 @@ import java.util.Map;
 import org.bukkit.inventory.ItemStack;
 
 import com.mitsugaru.KarmicMarket.config.PackageConfig;
-import com.mitsugaru.KarmicMarket.config.PackageConfig.KMInfo;
 import com.mitsugaru.KarmicMarket.config.RootConfig;
 
 public class MarketInfo
 {
 	private String marketName, packageName;
-	private Map<ItemStack, KMInfo> itemList = new HashMap<ItemStack, KMInfo>();
+	private Map<ItemStack, ItemInfo> itemList = new HashMap<ItemStack, ItemInfo>();
 	
 	public MarketInfo(String marketName, String packageName)
 	{
@@ -24,12 +23,20 @@ public class MarketInfo
 	private void populateItemList()
 	{
 		final PackageConfig pConfig = RootConfig.getPackageConfig(packageName);
-		for(Map.Entry<Item, KMInfo> entry : pConfig.getItems().entrySet())
+		for(Map.Entry<Item, ItemInfo> entry : pConfig.getItems().entrySet())
 		{
 			ItemStack item = entry.getKey().toItemStack();
 			item.setAmount(entry.getValue().getStack());
 			itemList.put(item, entry.getValue());
 		}
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		int hash = 0;
+		hash += marketName.hashCode() + packageName.hashCode();
+		return hash;
 	}
 
 	@Override
@@ -48,7 +55,7 @@ public class MarketInfo
 		return false;
 	}
 	
-	public Map<ItemStack, KMInfo> getItems()
+	public Map<ItemStack, ItemInfo> getItems()
 	{
 		return itemList;
 	}

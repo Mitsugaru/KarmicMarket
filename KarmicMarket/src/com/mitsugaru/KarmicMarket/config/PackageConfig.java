@@ -10,13 +10,14 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import com.mitsugaru.KarmicMarket.inventory.Item;
+import com.mitsugaru.KarmicMarket.inventory.ItemInfo;
 
 public class PackageConfig
 {
 	private File file;
 	private YamlConfiguration config;
 	private String packageName = "";
-	private Map<Item, KMInfo> items = new LinkedHashMap<Item, KMInfo>();
+	private Map<Item, ItemInfo> items = new LinkedHashMap<Item, ItemInfo>();
 	private double defaultAmount = 10.0;
 	private int defaultStack = 1;
 
@@ -89,7 +90,7 @@ public class PackageConfig
 		return packageName;
 	}
 
-	public Map<Item, KMInfo> getItems()
+	public Map<Item, ItemInfo> getItems()
 	{
 		return items;
 	}
@@ -196,33 +197,10 @@ public class PackageConfig
 		}
 	}
 
-	private KMInfo parseInfo(final String path)
+	private ItemInfo parseInfo(final String path)
 	{
 		final double amount = config.getDouble(path + ".amount", defaultAmount);
 		final int stack = config.getInt(path + ".stack", defaultStack);
-		return new KMInfo(amount, stack);
-	}
-
-	public class KMInfo
-	{
-		// TODO define info per item
-		private double amount;
-		private int stack;
-
-		public KMInfo(double amount, int stack)
-		{
-			this.amount = amount;
-			this.stack = stack;
-		}
-
-		public double getAmount()
-		{
-			return amount;
-		}
-
-		public int getStack()
-		{
-			return stack;
-		}
+		return new ItemInfo(amount, stack);
 	}
 }

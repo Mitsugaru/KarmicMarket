@@ -52,7 +52,7 @@ public class MarketInventoryHolder implements InventoryHolder
 		if(viewers.size() <= 0)
 		{
 			//Remove from player listener hashmap as there are no more viewers
-			KarmicMarket.openMarkets.remove(this);
+			KarmicMarket.openMarkets.remove(info);
 		}
 	}
 }
