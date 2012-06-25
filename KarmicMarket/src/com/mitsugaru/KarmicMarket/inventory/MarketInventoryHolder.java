@@ -55,4 +55,9 @@ public class MarketInventoryHolder implements InventoryHolder
 			KarmicMarket.openMarkets.remove(info);
 		}
 	}
+	
+	public Set<String> getViewers()
+	{
+		return viewers;
+	}
 }

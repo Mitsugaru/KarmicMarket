@@ -36,7 +36,7 @@ public class EconomyLogic
 			vault = true;
 		}
 		// Check playerpoints
-		Plugin playerPointsPlugin = plugin.getServer().getPluginManager()
+		final Plugin playerPointsPlugin = plugin.getServer().getPluginManager()
 				.getPlugin("PlayerPoints");
 		if (playerPointsPlugin != null)
 		{

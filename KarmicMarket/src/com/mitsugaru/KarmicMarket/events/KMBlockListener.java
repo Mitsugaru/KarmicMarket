@@ -36,72 +36,69 @@ public class KMBlockListener implements Listener
 		{
 			return;
 		}
-		if (ChatColor.stripColor(event.getLine(1)).equalsIgnoreCase(
+		if (!ChatColor.stripColor(event.getLine(1)).equalsIgnoreCase(
 				KarmicMarket.TAG))
 		{
-			if (PermissionHandler.has(event.getPlayer(), PermissionNode.SIGN))
+			return;
+		}
+		if (PermissionHandler.has(event.getPlayer(), PermissionNode.SIGN))
+		{
+			event.getPlayer().sendMessage(
+					ChatColor.RED + KarmicMarket.TAG + " Lack permission: "
+							+ PermissionNode.SIGN.getNode());
+			return;
+		}
+		String marketName = null;
+		if (!ChatColor.stripColor(event.getLine(0)).equalsIgnoreCase(""))
+		{
+			marketName = event.getLine(0);
+		}
+		else
+		{
+			// Cannot be empty
+			event.getPlayer().sendMessage(
+					ChatColor.YELLOW + KarmicMarket.TAG
+							+ " No market specified!");
+			event.setCancelled(true);
+			return;
+		}
+		//TODO validate
+		// Reformat sign
+		event.setLine(0, marketName);
+		event.setLine(1, KarmicMarket.TAG);
+		event.setLine(2, "Package:");
+		// TODO get the market's first package if it has any
+		event.setLine(3, "");
+		// check if there's a chest, if enabled in config
+
+		if (plugin.getRootConfig().needsChest)
+		{
+			// Thanks to Wolvereness for the following code
+			if (event.getBlock().getRelative(BlockFace.DOWN).getType()
+					.equals(Material.CHEST))
 			{
-				String marketName = null;
-				if (!ChatColor.stripColor(event.getLine(0))
-						.equalsIgnoreCase(""))
-				{
-					marketName = event.getLine(0);
-				}
-				else
-				{
-					// Cannot be empty
-					event.getPlayer().sendMessage(
-							ChatColor.YELLOW + KarmicMarket.TAG
-									+ " No market specified!");
-					event.setCancelled(true);
-				}
-				// Reformat sign
-				event.setLine(0, marketName);
-				event.setLine(1, KarmicMarket.TAG);
-				event.setLine(2, "Package:");
-				// TODO get the market's first package if it has any
-				event.setLine(3, "");
-				// check if there's a chest, if enabled in config
-
-				if (plugin.getRootConfig().needsChest)
-				{
-					// Thanks to Wolvereness for the following code
-					if (event.getBlock().getRelative(BlockFace.DOWN).getType()
-							.equals(Material.CHEST))
-					{
-						event.getPlayer().sendMessage(
-								ChatColor.GREEN
-										+ KarmicMarket.TAG
-										+ " Market linked to "
-										+ ChatColor.GRAY
-										+ ChatColor.stripColor(marketName)
-												.toLowerCase());
-					}
-					else
-					{
-
-						event.getPlayer().sendMessage(
-								ChatColor.YELLOW + KarmicMarket.TAG
-										+ " No chest found!");
-					}
-				}
-				else
-				{
-					event.getPlayer().sendMessage(
-							ChatColor.GREEN
-									+ KarmicMarket.TAG
-									+ " Market linked to "
-									+ ChatColor.GRAY
-									+ ChatColor.stripColor(marketName)
-											.toLowerCase());
-				}
+				event.getPlayer().sendMessage(
+						ChatColor.GREEN
+								+ KarmicMarket.TAG
+								+ " Market linked to "
+								+ ChatColor.GRAY
+								+ ChatColor.stripColor(marketName)
+										.toLowerCase());
 			}
 			else
 			{
+
 				event.getPlayer().sendMessage(
-						ChatColor.RED + KarmicMarket.TAG + " Lack permission: "
-								+ PermissionNode.SIGN.getNode());
+						ChatColor.YELLOW + KarmicMarket.TAG
+								+ " No chest found!");
 			}
+		}
+		else
+		{
+			event.getPlayer().sendMessage(
+					ChatColor.GREEN + KarmicMarket.TAG + " Market linked to "
+							+ ChatColor.GRAY
+							+ ChatColor.stripColor(marketName).toLowerCase());
 		}
 	}
 

@@ -8,8 +8,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 
 import com.mitsugaru.KarmicMarket.KarmicMarket;
+import com.mitsugaru.KarmicMarket.inventory.MarketInfo;
+import com.mitsugaru.KarmicMarket.inventory.MarketInventoryHolder;
 
 public class RootConfig
 {
@@ -64,7 +67,7 @@ public class RootConfig
 			}
 			if (!exists)
 			{
-				// TODO notify that the directory does not exist
+				// notify that the directory does not exist
 				plugin.getLogger()
 						.warning("Packages directory does not exist!");
 				return;
@@ -114,7 +117,7 @@ public class RootConfig
 			}
 			if (!exists)
 			{
-				// TODO notify that the directory does not exist
+				// notify that the directory does not exist
 				plugin.getLogger().warning("Shops directory does not exist!");
 				return;
 			}
@@ -144,7 +147,21 @@ public class RootConfig
 		final ConfigurationSection config = plugin.getConfig();
 		// Load settings
 		loadSettings(config);
-		// TODO close all open inventories
+		// close all open inventories
+		for (Entry<MarketInfo, MarketInventoryHolder> entry : KarmicMarket.openMarkets
+				.entrySet())
+		{
+			for (String name : entry.getValue().getViewers())
+			{
+				final Player player = plugin.getServer().getPlayer(name);
+				if (player != null)
+				{
+					player.closeInventory();
+				}
+			}
+		}
+		// Clear open inventories
+		KarmicMarket.openMarkets.clear();
 		// Clear set of current packages
 		packages.clear();
 		// Load packages

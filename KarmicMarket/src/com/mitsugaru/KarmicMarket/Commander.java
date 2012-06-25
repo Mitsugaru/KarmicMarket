@@ -58,7 +58,9 @@ public class Commander implements CommandExecutor
 				}
 				else
 				{
-					// TODO notify sender that they lack permission
+					sender.sendMessage(ChatColor.RED + KarmicMarket.TAG
+							+ " Lack permission: "
+							+ PermissionNode.ADMIN_RELOAD.getNode());
 				}
 			}
 			else if (com.equals("create"))

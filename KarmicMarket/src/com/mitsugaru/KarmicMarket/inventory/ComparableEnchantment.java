@@ -22,9 +22,11 @@ public class ComparableEnchantment extends EnchantmentWrapper implements Compara
     
     /**
      * Compares the enchantment ids to give order and allow for sorting.
+     * 
+     * @param enchantment - ComparableEnchantment to compare to
      */
     @Override
-    public int compareTo(ComparableEnchantment o) {
-        return getId() - o.getId();
+    public int compareTo(ComparableEnchantment enchantment) {
+        return getId() - enchantment.getId();
     }
 }

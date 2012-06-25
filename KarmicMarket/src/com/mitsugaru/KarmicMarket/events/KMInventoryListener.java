@@ -1,6 +1,10 @@
 package com.mitsugaru.KarmicMarket.events;
 
+import java.util.HashMap;
+
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -8,10 +12,13 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.inventory.ItemStack;
 
 import com.mitsugaru.KarmicMarket.KarmicMarket;
 import com.mitsugaru.KarmicMarket.inventory.MarketInventoryHolder;
 import com.mitsugaru.KarmicMarket.inventory.Item;
+import com.mitsugaru.KarmicMarket.logic.EconomyLogic;
+import com.mitsugaru.KarmicMarket.tasks.Repopulate;
 
 public class KMInventoryListener implements Listener
 {
@@ -39,7 +46,7 @@ public class KMInventoryListener implements Listener
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onInventoryClose(InventoryCloseEvent event)
 	{
-		if(event.getPlayer() == null)
+		if (event.getPlayer() == null)
 		{
 			return;
 		}
@@ -53,8 +60,11 @@ public class KMInventoryListener implements Listener
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onInventoryClick(InventoryClickEvent event)
 	{
-		plugin.getLogger().info("inventory");
 		if (event.isCancelled())
+		{
+			return;
+		}
+		else if (!(event.getWhoClicked() instanceof Player))
 		{
 			return;
 		}
@@ -63,13 +73,11 @@ public class KMInventoryListener implements Listener
 		{
 			return;
 		}
-		plugin.getLogger().info("market");
 		// Check if they are interacting with top or bottom inventory
 		boolean fromChest = false;
 		if (event.getRawSlot() < 54)
 		{
 			fromChest = true;
-			plugin.getLogger().info("from chest");
 		}
 		/**
 		 * Market logic
@@ -78,64 +86,126 @@ public class KMInventoryListener implements Listener
 		if (event.isShiftClick())
 		{
 			plugin.getLogger().info("shift click");
-			if (event.isLeftClick())
+			if (event.getCurrentItem().getType().equals(Material.AIR))
 			{
-				// handle shift left click
-				if (fromChest)
-				{
-					buyItem(event);
-				}
-				else if (event.getInventory().firstEmpty() >= 0)
-				{
-					sellItem(event);
-				}
+				return;
 			}
-			else if (event.isRightClick())
+			else if (fromChest)
 			{
-				// handle shift right click
-			}
-		}
-		else
-		{
-			if (event.isLeftClick() && fromChest)
-			{
-				// handle left click
-				buyItem(event);
-			}
-			else if (event.isRightClick() && fromChest)
-			{
-				// handle right click
-				sellItem(event);
-			}
-		}
-	}
-
-	private void buyItem(InventoryClickEvent event)
-	{
-		plugin.getLogger().info("buy");
-		if (!event.getCurrentItem().getType().equals(Material.AIR)
-				&& !event.getCursor().getType().equals(Material.AIR))
-		{
-			final Item a = new Item(event.getCurrentItem());
-			final Item b = new Item(event.getCursor());
-			if (a.areSame(b))
-			{
-				// Add to cursor
-				event.getCursor().setAmount(
-						event.getCursor().getAmount()
-								+ event.getCurrentItem().getAmount());
+				buyItem(event, false);
 			}
 			else if (event.getInventory().firstEmpty() >= 0)
 			{
-				// Not the same, try to move it to their inventory
-				event.getWhoClicked().getInventory()
-						.addItem(event.getCurrentItem());
+				sellItem(event, false);
 			}
 		}
-		event.setCancelled(true);
+		else if (fromChest)
+		{
+			if (event.getCurrentItem().getType().equals(Material.AIR))
+			{
+				return;
+			}
+			else if (event.isLeftClick())
+			{
+				buyItem(event, true);
+			}
+			else if (event.isRightClick())
+			{
+				sellItem(event, true);
+			}
+		}
 	}
 
-	private void sellItem(InventoryClickEvent event)
+	private void buyItem(InventoryClickEvent event, boolean toCursor)
+	{
+		final MarketInventoryHolder holder = instanceCheck(event);
+		final Item product = new Item(event.getCurrentItem());
+		final double price = holder.getMarketInfo().getItems()
+				.get(event.getCurrentItem()).getAmount();
+		final Player player = (Player) event.getWhoClicked();
+		if (toCursor)
+		{
+			// Check cursor if its the same
+			if (!event.getCursor().getType().equals(Material.AIR))
+			{
+				final Item cursor = new Item(event.getCursor());
+				if (product.areSame(cursor))
+				{
+					// check if they can pay
+					if (!EconomyLogic.denyPay(player, price))
+					{
+						// Pay for item
+						EconomyLogic.pay(player, price);
+						// Add to cursor
+						event.getCursor().setAmount(
+								event.getCursor().getAmount()
+										+ event.getCurrentItem().getAmount());
+					}
+					else
+					{
+						// denied
+						player.sendMessage(ChatColor.YELLOW + KarmicMarket.TAG
+								+ " Cannot pay " + ChatColor.GOLD + price
+								+ ChatColor.YELLOW + " for " + ChatColor.AQUA
+								+ event.getCurrentItem().toString());
+					}
+					event.setCancelled(true);
+					return;
+				}
+			}
+			// Else, we handle it to go to their inventory
+		}
+		// check if they can pay
+		if (EconomyLogic.denyPay(player, price))
+		{
+			// Cannot pay
+			player.sendMessage(ChatColor.YELLOW + KarmicMarket.TAG
+					+ " Cannot pay " + ChatColor.GOLD + price
+					+ ChatColor.YELLOW + " for " + ChatColor.AQUA
+					+ event.getCurrentItem().toString());
+			event.setCancelled(true);
+			return;
+		}
+
+		// Handle item going to inventory
+		final HashMap<Integer, ItemStack> remaining = event.getWhoClicked()
+				.getInventory().addItem(event.getCurrentItem());
+		if (remaining.isEmpty())
+		{
+			// repopulate slot that they just took
+			final Repopulate task = new Repopulate(holder.getInventory(),
+					product.toItemStack());
+			final int id = plugin.getServer().getScheduler()
+					.scheduleSyncDelayedTask(plugin, task, 1);
+			if (id == -1)
+			{
+				// Something went wrong
+				// notify
+				plugin.getLogger().warning(
+						"Could not schedule repopulate task on buyItem for "
+								+ player.getName() + " on item "
+								+ event.getCurrentItem().toString());
+				player.sendMessage(ChatColor.YELLOW + KarmicMarket.TAG
+						+ " Something went wrong...");
+			}
+			player.sendMessage(ChatColor.GREEN + KarmicMarket.TAG + " Bought"
+					+ ChatColor.AQUA + event.getCurrentItem().toString()
+					+ ChatColor.GREEN + " for " + ChatColor.GOLD + price);
+		}
+		else
+		{
+			// Cancel
+			event.setCancelled(true);
+			// notify that they have no space
+			player.sendMessage(ChatColor.YELLOW + KarmicMarket.TAG
+					+ " No space available to purchase item...");
+			return;
+		}
+		// Pay for item
+		EconomyLogic.pay(player, price);
+	}
+
+	private void sellItem(InventoryClickEvent event, boolean fromCursor)
 	{
 		plugin.getLogger().info("sell");
 	}
