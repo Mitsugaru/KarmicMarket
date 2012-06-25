@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map.Entry;
 
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
@@ -234,8 +235,8 @@ public class DoubleInventory implements Inventory {
         HashMap<Integer, T> result = new HashMap<Integer, T>(first);
 
         // Put in items from the second map, adjusting key values.
-        for (Integer key : second.keySet()) {
-            result.put(new Integer(key.intValue() + offset), (T) second.get(key));
+        for (Entry<Integer, ? extends T> entry : second.entrySet()) {
+            result.put(Integer.valueOf(entry.getKey().intValue() + offset), (T) entry.getValue());
         }
 
         return result;

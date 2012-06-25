@@ -53,29 +53,40 @@ public class RootConfig
 		{
 			final File directory = new File(plugin.getDataFolder()
 					.getAbsolutePath() + "/packages");
+			boolean exists = false;
 			if (!directory.exists())
 			{
-				directory.mkdir();
+				exists = directory.mkdir();
+			}
+			else
+			{
+				exists = true;
+			}
+			if (!exists)
+			{
+				// TODO notify that the directory does not exist
+				plugin.getLogger()
+						.warning("Packages directory does not exist!");
+				return;
 			}
 			// Grab all files
 			for (final File file : directory.listFiles())
 			{
-				if (file.isFile())
+				if (!file.isFile())
 				{
-					PackageConfig pack = new PackageConfig(file);
-					if (!pack.isEmpty())
-					{
-						packages.put(pack.getName(), pack);
-					}
-					else
-					{
-						// notify
-						plugin.getLogger()
-								.warning(
-										"Package file '"
-												+ file.getName()
-												+ "' appears to be empty? Not added...");
-					}
+					continue;
+				}
+				PackageConfig pack = new PackageConfig(file);
+				if (!pack.isEmpty())
+				{
+					packages.put(pack.getName(), pack);
+				}
+				else
+				{
+					// notify
+					plugin.getLogger().warning(
+							"Package file '" + file.getName()
+									+ "' appears to be empty? Not added...");
 				}
 			}
 		}
@@ -92,18 +103,30 @@ public class RootConfig
 		{
 			final File directory = new File(plugin.getDataFolder()
 					.getAbsolutePath() + "/shops");
+			boolean exists = false;
 			if (!directory.exists())
 			{
-				directory.mkdir();
+				exists = directory.mkdir();
+			}
+			else
+			{
+				exists = true;
+			}
+			if (!exists)
+			{
+				// TODO notify that the directory does not exist
+				plugin.getLogger().warning("Shops directory does not exist!");
+				return;
 			}
 			// Grab all files
 			for (final File file : directory.listFiles())
 			{
-				if (file.isFile())
+				if (!file.isFile())
 				{
-					final MarketConfig market = new MarketConfig(file);
-					markets.put(market.getName(), market);
+					continue;
 				}
+				final MarketConfig market = new MarketConfig(file);
+				markets.put(market.getName(), market);
 			}
 		}
 		catch (SecurityException s)
@@ -142,9 +165,9 @@ public class RootConfig
 
 	public MarketConfig getMarketConfig(String name)
 	{
-		for(String market : markets.keySet())
+		for (String market : markets.keySet())
 		{
-			if(market.equalsIgnoreCase(name))
+			if (market.equalsIgnoreCase(name))
 			{
 				return markets.get(market);
 			}
@@ -154,9 +177,9 @@ public class RootConfig
 
 	public static PackageConfig getPackageConfig(String name)
 	{
-		for(String p : packages.keySet())
+		for (String p : packages.keySet())
 		{
-			if(p.equalsIgnoreCase(name))
+			if (p.equalsIgnoreCase(name))
 			{
 				return packages.get(p);
 			}
@@ -186,12 +209,12 @@ public class RootConfig
 		}
 		return created;
 	}
-	
+
 	public boolean marketExists(String name)
 	{
-		for(String market : markets.keySet())
+		for (String market : markets.keySet())
 		{
-			if(market.equalsIgnoreCase(name))
+			if (market.equalsIgnoreCase(name))
 			{
 				return true;
 			}

@@ -21,7 +21,7 @@ public class Commander implements CommandExecutor
 	public Commander(KarmicMarket plugin)
 	{
 		this.plugin = plugin;
-		this.config = plugin.getPluginConfig();
+		this.config = plugin.getRootConfig();
 	}
 
 	@Override

@@ -42,7 +42,7 @@ public class PackageConfig
 			ia.printStackTrace();
 		}
 	}
-	
+
 	public void save()
 	{
 		try
@@ -88,7 +88,7 @@ public class PackageConfig
 	{
 		return packageName;
 	}
-	
+
 	public Map<Item, KMInfo> getItems()
 	{
 		return items;
@@ -206,13 +206,23 @@ public class PackageConfig
 	public class KMInfo
 	{
 		// TODO define info per item
-		public double amount;
-		public int stack;
+		private double amount;
+		private int stack;
 
 		public KMInfo(double amount, int stack)
 		{
 			this.amount = amount;
 			this.stack = stack;
+		}
+
+		public double getAmount()
+		{
+			return amount;
+		}
+
+		public int getStack()
+		{
+			return stack;
 		}
 	}
 }

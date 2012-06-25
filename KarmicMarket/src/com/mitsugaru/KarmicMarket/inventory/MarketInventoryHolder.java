@@ -1,13 +1,19 @@
 package com.mitsugaru.KarmicMarket.inventory;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+
+import com.mitsugaru.KarmicMarket.KarmicMarket;
 
 public class MarketInventoryHolder implements InventoryHolder
 {
 	private Inventory inventory = null;
 	private MarketInfo info;
+	private Set<String> viewers = new HashSet<String>();
 	
 	public MarketInventoryHolder(MarketInfo info)
 	{
@@ -17,11 +23,11 @@ public class MarketInventoryHolder implements InventoryHolder
 	public void setInventory(Inventory inventory)
 	{
 		this.inventory = inventory;
-		for(ItemStack i : info.getItemList())
+		for(ItemStack i : info.getItems().keySet())
 		{
 			inventory.addItem(i);
 		}
-		//TODO populate with appropriate package items of the market
+		//populate with appropriate package items of the market
 	}
 	
 	@Override
@@ -35,4 +41,18 @@ public class MarketInventoryHolder implements InventoryHolder
 		return info;
 	}
 
+	public void addViewer(String name)
+	{
+		viewers.add(name);
+	}
+	
+	public void removeViewer(String name)
+	{
+		viewers.remove(name);
+		if(viewers.size() <= 0)
+		{
+			//Remove from player listener hashmap as there are no more viewers
+			KarmicMarket.openMarkets.remove(this);
+		}
+	}
 }

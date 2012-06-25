@@ -25,25 +25,28 @@ public class KMInventoryListener implements Listener
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onInventoryOpen(InventoryOpenEvent event)
 	{
-		if (!event.isCancelled())
+		if (event.isCancelled() || event.getPlayer() == null)
 		{
-			plugin.getLogger().info("open inventory");
-			final MarketInventoryHolder holder = instanceCheck(event);
-			if (holder != null)
-			{
-				holder.getMarketInfo().addViewer();
-			}
+			return;
+		}
+		final MarketInventoryHolder holder = instanceCheck(event);
+		if (holder != null)
+		{
+			holder.addViewer(event.getPlayer().getName());
 		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onInventoryClose(InventoryCloseEvent event)
 	{
-		plugin.getLogger().info("close inventory");
+		if(event.getPlayer() == null)
+		{
+			return;
+		}
 		final MarketInventoryHolder holder = instanceCheck(event);
 		if (holder != null)
 		{
-			holder.getMarketInfo().removeViewer();
+			holder.removeViewer(event.getPlayer().getName());
 		}
 	}
 
@@ -51,56 +54,58 @@ public class KMInventoryListener implements Listener
 	public void onInventoryClick(InventoryClickEvent event)
 	{
 		plugin.getLogger().info("inventory");
-		if (!event.isCancelled())
+		if (event.isCancelled())
 		{
-			final MarketInventoryHolder holder = instanceCheck(event);
-			if (holder != null)
+			return;
+		}
+		final MarketInventoryHolder holder = instanceCheck(event);
+		if (holder == null)
+		{
+			return;
+		}
+		plugin.getLogger().info("market");
+		// Check if they are interacting with top or bottom inventory
+		boolean fromChest = false;
+		if (event.getRawSlot() < 54)
+		{
+			fromChest = true;
+			plugin.getLogger().info("from chest");
+		}
+		/**
+		 * Market logic
+		 */
+		// Handle shift click
+		if (event.isShiftClick())
+		{
+			plugin.getLogger().info("shift click");
+			if (event.isLeftClick())
 			{
-				plugin.getLogger().info("market");
-				// Check if they are interacting with top or bottom inventory
-				boolean fromChest = false;
-				if (event.getRawSlot() < 54)
+				// handle shift left click
+				if (fromChest)
 				{
-					fromChest = true;
-					plugin.getLogger().info("from chest");
+					buyItem(event);
 				}
-				/**
-				 * Market logic
-				 */
-				// Handle shift click
-				if (event.isShiftClick())
+				else if (event.getInventory().firstEmpty() >= 0)
 				{
-					plugin.getLogger().info("shift click");
-					if (event.isLeftClick())
-					{
-						// handle shift left click
-						if (fromChest)
-						{
-							buyItem(event);
-						}
-						else if (event.getInventory().firstEmpty() >= 0)
-						{
-							sellItem(event);
-						}
-					}
-					else if (event.isRightClick())
-					{
-						// handle shift right click
-					}
+					sellItem(event);
 				}
-				else
-				{
-					if (event.isLeftClick() && fromChest)
-					{
-						// handle left click
-							buyItem(event);
-					}
-					else if (event.isRightClick() && fromChest)
-					{
-						// handle right click
-						sellItem(event);
-					}
-				}
+			}
+			else if (event.isRightClick())
+			{
+				// handle shift right click
+			}
+		}
+		else
+		{
+			if (event.isLeftClick() && fromChest)
+			{
+				// handle left click
+				buyItem(event);
+			}
+			else if (event.isRightClick() && fromChest)
+			{
+				// handle right click
+				sellItem(event);
 			}
 		}
 	}
@@ -115,15 +120,16 @@ public class KMInventoryListener implements Listener
 			final Item b = new Item(event.getCursor());
 			if (a.areSame(b))
 			{
-				//Add to cursor
+				// Add to cursor
 				event.getCursor().setAmount(
 						event.getCursor().getAmount()
 								+ event.getCurrentItem().getAmount());
 			}
 			else if (event.getInventory().firstEmpty() >= 0)
 			{
-				//Not the same, try to move it to their inventory
-				event.getWhoClicked().getInventory().addItem(event.getCurrentItem());
+				// Not the same, try to move it to their inventory
+				event.getWhoClicked().getInventory()
+						.addItem(event.getCurrentItem());
 			}
 		}
 		event.setCancelled(true);
@@ -134,7 +140,7 @@ public class KMInventoryListener implements Listener
 		plugin.getLogger().info("sell");
 	}
 
-	public MarketInventoryHolder instanceCheck(InventoryEvent event)
+	private MarketInventoryHolder instanceCheck(InventoryEvent event)
 	{
 		MarketInventoryHolder holder = null;
 		try

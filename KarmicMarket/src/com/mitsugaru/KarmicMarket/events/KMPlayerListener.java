@@ -1,8 +1,5 @@
 package com.mitsugaru.KarmicMarket.events;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -25,18 +22,25 @@ import com.mitsugaru.KarmicMarket.inventory.MarketInventoryHolder;
 public class KMPlayerListener implements Listener
 {
 	private KarmicMarket plugin;
-	public static Map<MarketInfo, MarketInventoryHolder> openMarkets = new HashMap<MarketInfo, MarketInventoryHolder>();
 
 	public KMPlayerListener(KarmicMarket plugin)
 	{
 		this.plugin = plugin;
 	}
-	
+
 	public void onPlayerQuit(final PlayerQuitEvent event)
 	{
-		// TODO player quit event, since that doesn't throw an inventory close
-		// event
-		// just to double check
+		// since event that doesn't throw an inventory close event
+		// Do holder removal logic just to double check
+		if (event.getPlayer() == null)
+		{
+			return;
+		}
+		// Iterate through all open markets and remove player from viewer set
+		for (MarketInventoryHolder holder : KarmicMarket.openMarkets.values())
+		{
+			holder.removeViewer(event.getPlayer().getName());
+		}
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL)
@@ -101,7 +105,7 @@ public class KMPlayerListener implements Listener
 					// Show inventory IF chests are disabled
 					if (right)
 					{
-						if (plugin.getPluginConfig().needsChest)
+						if (plugin.getRootConfig().needsChest)
 						{
 							// Cycle
 							cycleMarketPackage(sign, false);
@@ -134,7 +138,7 @@ public class KMPlayerListener implements Listener
 		// Grab package name
 		final String packageName = ChatColor.stripColor(sign.getLine(3));
 		// Grab config
-		final MarketConfig marketConfig = plugin.getPluginConfig()
+		final MarketConfig marketConfig = plugin.getRootConfig()
 				.getMarketConfig(marketName);
 		if (marketConfig == null)
 		{
@@ -204,10 +208,10 @@ public class KMPlayerListener implements Listener
 		final MarketInfo market = new MarketInfo(marketName, packageName);
 		// See if the market inventory is already open
 		Inventory inventory = null;
-		if (openMarkets.containsKey(market))
+		if (KarmicMarket.openMarkets.containsKey(market))
 		{
 			// Show the existing inventory to that player
-			inventory = openMarkets.get(market).getInventory();
+			inventory = KarmicMarket.openMarkets.get(market).getInventory();
 		}
 		else
 		{
@@ -233,7 +237,7 @@ public class KMPlayerListener implements Listener
 
 	private boolean signIsActivated(final Sign sign)
 	{
-		if (plugin.getPluginConfig().needsChest)
+		if (plugin.getRootConfig().needsChest)
 		{
 			if (!sign.getBlock().getRelative(BlockFace.DOWN).getType()
 					.equals(Material.CHEST))

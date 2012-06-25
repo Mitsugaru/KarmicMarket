@@ -1,7 +1,6 @@
 package com.mitsugaru.KarmicMarket.inventory;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.inventory.ItemStack;
@@ -9,13 +8,11 @@ import org.bukkit.inventory.ItemStack;
 import com.mitsugaru.KarmicMarket.config.PackageConfig;
 import com.mitsugaru.KarmicMarket.config.PackageConfig.KMInfo;
 import com.mitsugaru.KarmicMarket.config.RootConfig;
-import com.mitsugaru.KarmicMarket.events.KMPlayerListener;
 
 public class MarketInfo
 {
 	private String marketName, packageName;
-	private int viewers = 0;
-	private List<ItemStack> itemList = new ArrayList<ItemStack>();
+	private Map<ItemStack, KMInfo> itemList = new HashMap<ItemStack, KMInfo>();
 	
 	public MarketInfo(String marketName, String packageName)
 	{
@@ -30,8 +27,8 @@ public class MarketInfo
 		for(Map.Entry<Item, KMInfo> entry : pConfig.getItems().entrySet())
 		{
 			ItemStack item = entry.getKey().toItemStack();
-			item.setAmount(entry.getValue().stack);
-			itemList.add(item);
+			item.setAmount(entry.getValue().getStack());
+			itemList.put(item, entry.getValue());
 		}
 	}
 
@@ -51,7 +48,7 @@ public class MarketInfo
 		return false;
 	}
 	
-	public List<ItemStack> getItemList()
+	public Map<ItemStack, KMInfo> getItems()
 	{
 		return itemList;
 	}
@@ -64,20 +61,5 @@ public class MarketInfo
 	public String getPackageName()
 	{
 		return packageName;
-	}
-	
-	public void addViewer()
-	{
-		viewers += 1;
-	}
-	
-	public void removeViewer()
-	{
-		viewers -= 1;
-		if(viewers <= 0)
-		{
-			//Remove from player listener hashmap as there are no more viewers
-			KMPlayerListener.openMarkets.remove(this);
-		}
 	}
 }

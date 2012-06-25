@@ -21,7 +21,7 @@ public class EconomyLogic
 	public static void init(KarmicMarket km)
 	{
 		plugin = km;
-		rootConfig = plugin.getPluginConfig();
+		rootConfig = plugin.getRootConfig();
 	}
 
 	public static boolean setupEconomy()
@@ -29,7 +29,7 @@ public class EconomyLogic
 		// Check vault
 		RegisteredServiceProvider<Economy> economyProvider = plugin.getServer()
 				.getServicesManager()
-				.getRegistration(net.milkbowl.vault.economy.Economy.class);
+				.getRegistration(Economy.class);
 		if (economyProvider != null)
 		{
 			eco = economyProvider.getProvider();
