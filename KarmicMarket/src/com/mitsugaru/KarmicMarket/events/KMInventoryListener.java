@@ -121,7 +121,8 @@ public class KMInventoryListener implements Listener
 		final MarketInventoryHolder holder = instanceCheck(event);
 		final Item product = new Item(event.getCurrentItem());
 		final double price = holder.getMarketInfo().getItems()
-				.get(event.getCurrentItem()).getAmount();
+				.get(event.getCurrentItem()).getAmount()
+				* -1;
 		final Player player = (Player) event.getWhoClicked();
 		if (toCursor)
 		{
@@ -140,6 +141,11 @@ public class KMInventoryListener implements Listener
 						event.getCursor().setAmount(
 								event.getCursor().getAmount()
 										+ event.getCurrentItem().getAmount());
+						player.sendMessage(ChatColor.GREEN + KarmicMarket.TAG
+								+ " Bought " + ChatColor.AQUA
+								+ event.getCurrentItem().toString()
+								+ ChatColor.GREEN + " for " + ChatColor.GOLD
+								+ price);
 					}
 					else
 					{
@@ -188,7 +194,7 @@ public class KMInventoryListener implements Listener
 				player.sendMessage(ChatColor.YELLOW + KarmicMarket.TAG
 						+ " Something went wrong...");
 			}
-			player.sendMessage(ChatColor.GREEN + KarmicMarket.TAG + " Bought"
+			player.sendMessage(ChatColor.GREEN + KarmicMarket.TAG + " Bought "
 					+ ChatColor.AQUA + event.getCurrentItem().toString()
 					+ ChatColor.GREEN + " for " + ChatColor.GOLD + price);
 		}
