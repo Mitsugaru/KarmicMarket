@@ -80,17 +80,29 @@ public class RootConfig
 					continue;
 				}
 				PackageConfig pack = new PackageConfig(file);
-				if (!pack.isEmpty())
+				if (!pack.getName().matches(KarmicMarket.MARKET_NAME_REGEX))
 				{
-					packages.put(pack.getName(), pack);
+					plugin.getLogger().warning(
+							"Package file '" + file.getName()
+									+ "' name is not alphanumeric.");
+					continue;
 				}
-				else
+				else if (pack.getName().length() > 15)
+				{
+					plugin.getLogger().warning(
+							"Package file '" + file.getName()
+									+ "' name exceeds 15 characters.");
+					continue;
+				}
+				else if (pack.isEmpty())
 				{
 					// notify
 					plugin.getLogger().warning(
 							"Package file '" + file.getName()
 									+ "' appears to be empty? Not added...");
+					continue;
 				}
+				packages.put(pack.getName(), pack);
 			}
 		}
 		catch (SecurityException s)
@@ -129,6 +141,20 @@ public class RootConfig
 					continue;
 				}
 				final MarketConfig market = new MarketConfig(file);
+				if (!market.getName().matches(KarmicMarket.MARKET_NAME_REGEX))
+				{
+					plugin.getLogger().warning(
+							"Package file '" + file.getName()
+									+ "' name is not alphanumeric.");
+					continue;
+				}
+				else if (market.getName().length() > 15)
+				{
+					plugin.getLogger().warning(
+							"Package file '" + file.getName()
+									+ "' name exceeds 15 characters.");
+					continue;
+				}
 				markets.put(market.getName(), market);
 			}
 		}

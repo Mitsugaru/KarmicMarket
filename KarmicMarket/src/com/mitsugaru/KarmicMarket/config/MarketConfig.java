@@ -66,6 +66,12 @@ public class MarketConfig
 		save();
 	}
 	
+	private void set(String path, Object object)
+	{
+		config.set(path, object);
+		save();
+	}
+	
 	public void save()
 	{
 		try
@@ -143,6 +149,23 @@ public class MarketConfig
 	public String getOwner()
 	{
 		return owner;
+	}
+	
+	public void setOwner(String owner)
+	{
+		this.owner = owner;
+		set("market.owner", owner);
+	}
+	
+	public void addManager(String manager)
+	{
+		if(!marketManagers.contains(manager))
+		{
+			marketManagers.add(manager);
+			final List<String> managers = config.getStringList("market.managers");
+			managers.add(manager);
+			set("market.managers", managers);
+		}
 	}
 	
 	public boolean playerIsManager(String name)

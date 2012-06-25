@@ -19,6 +19,7 @@ public class KarmicMarket extends JavaPlugin
 {
 	//Class variables
 	public static final String TAG = "[KarmicMarket]";
+	public static final String MARKET_NAME_REGEX = "[\\p{Alnum}_[\\-]]*";
 	private RootConfig config;
 	public static final Map<MarketInfo, MarketInventoryHolder> openMarkets = new HashMap<MarketInfo, MarketInventoryHolder>();
 	

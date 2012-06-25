@@ -15,7 +15,6 @@ public class Commander implements CommandExecutor
 	private final KarmicMarket plugin;
 	private final RootConfig config;
 	private final static String bar = "======================";
-	private static final String MARKET_NAME_REGEX = "[\\p{Alnum}_[\\-]]*";
 	private long time = 0;
 
 	public Commander(KarmicMarket plugin)
@@ -88,7 +87,7 @@ public class Commander implements CommandExecutor
 			try
 			{
 				final String marketName = args[1];
-				if (!marketName.matches(MARKET_NAME_REGEX))
+				if (!marketName.matches(KarmicMarket.MARKET_NAME_REGEX))
 				{
 					sender.sendMessage(ChatColor.RED + KarmicMarket.TAG
 							+ " Market name must be alphanumeric.");
