@@ -158,6 +158,7 @@ public class KMInventoryListener implements Listener
 					event.setCancelled(true);
 					return;
 				}
+				event.setCancelled(true);
 			}
 			// Else, we handle it to go to their inventory
 		}
