@@ -1,5 +1,6 @@
 package com.mitsugaru.KarmicMarket.logic;
 
+import org.black_ixx.playerPoints.PlayerPointsAPI;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -16,7 +17,6 @@ public class EconomyLogic
 	private static RootConfig rootConfig;
 	private static Economy eco;
 	private static boolean playerpoints, vault;
-	private static Plugin pointsPlugin;
 
 	public static void init(KarmicMarket km)
 	{
@@ -40,7 +40,6 @@ public class EconomyLogic
 				.getPlugin("PlayerPoints");
 		if (playerPointsPlugin != null)
 		{
-			pointsPlugin = playerPointsPlugin;
 			playerpoints = true;
 		}
 		// None fond
@@ -71,8 +70,7 @@ public class EconomyLogic
 		}
 		if (playerpoints)
 		{
-			final int playerPoints = pointsPlugin.getConfig().getInt(
-					"Points." + player.getName());
+			final int playerPoints = PlayerPointsAPI.look(player.getName());
 			if (pay < 0.0)
 			{
 				pay *= 1;
@@ -150,10 +148,22 @@ public class EconomyLogic
 			}
 			else
 			{
-				plugin.getServer().dispatchCommand(
-						plugin.getServer().getConsoleSender(),
-						"points give " + player.getName() + " " + points);
-				paid = true;
+				if (amount > 0.0)
+				{
+					paid = PlayerPointsAPI.give(player.getName(), points);
+				}
+				else if (amount < 0.0)
+				{
+					// Don't override vault
+					if (paid)
+					{
+						PlayerPointsAPI.take(player.getName(), points);
+					}
+					else
+					{
+						paid = PlayerPointsAPI.take(player.getName(), points);
+					}
+				}
 				// TODO notify player, if config allows
 			}
 		}

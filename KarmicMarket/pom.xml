@@ -94,6 +94,13 @@
 			<artifactId>Vault</artifactId>
 			<version>1.2.17-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+		    <groupId>org.black_ixx.playerPoints</groupId>
+		    <artifactId>PlayerPoints</artifactId>
+		    <version>1.4.1</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/lib/PlayerPoints.jar</systemPath>
+		</dependency>
 	</dependencies>
 	<repositories>
 		<repository>

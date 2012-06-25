@@ -52,11 +52,14 @@ public class Commander implements CommandExecutor
 			}
 			else if (com.equals("reload"))
 			{
-				if (PermissionHandler.has(sender, PermissionNode.ADMIN))
+				if (PermissionHandler.has(sender, PermissionNode.ADMIN_RELOAD))
 				{
 					config.reloadConfig();
 				}
-				return true;
+				else
+				{
+					// TODO notify sender that they lack permission
+				}
 			}
 			else if (com.equals("create"))
 			{
@@ -73,9 +76,9 @@ public class Commander implements CommandExecutor
 		{
 			debugTime(sender, time);
 		}
-		return false;
+		return true;
 	}
-	
+
 	private boolean createMarketCommand(CommandSender sender, String[] args)
 	{
 		if (PermissionHandler.has(sender, PermissionNode.MARKET_CREATE))
@@ -91,34 +94,29 @@ public class Commander implements CommandExecutor
 				else if (marketName.length() > 15)
 				{
 					// Restrict length to sign character limit
-					sender.sendMessage(ChatColor.RED
-							+ KarmicMarket.TAG
+					sender.sendMessage(ChatColor.RED + KarmicMarket.TAG
 							+ " Market name must be 15 characters or less.");
 				}
 				else
 				{
 					if (config.marketExists(marketName))
 					{
-						sender.sendMessage(ChatColor.RED
-								+ KarmicMarket.TAG + " Market '"
-								+ ChatColor.GOLD + marketName
+						sender.sendMessage(ChatColor.RED + KarmicMarket.TAG
+								+ " Market '" + ChatColor.GOLD + marketName
 								+ ChatColor.RED + "' already exists.");
 						return true;
 					}
 					if (config.createMarket(marketName))
 					{
-						sender.sendMessage(ChatColor.GREEN
-								+ KarmicMarket.TAG + " Market '"
-								+ ChatColor.GOLD + marketName
+						sender.sendMessage(ChatColor.GREEN + KarmicMarket.TAG
+								+ " Market '" + ChatColor.GOLD + marketName
 								+ ChatColor.GREEN + "' created.");
 					}
 					else
 					{
-						sender.sendMessage(ChatColor.RED
-								+ KarmicMarket.TAG + " Market '"
-								+ ChatColor.GOLD + marketName
-								+ ChatColor.RED
-								+ "' could not be created!");
+						sender.sendMessage(ChatColor.RED + KarmicMarket.TAG
+								+ " Market '" + ChatColor.GOLD + marketName
+								+ ChatColor.RED + "' could not be created!");
 					}
 				}
 			}
