@@ -63,7 +63,16 @@ public class KMBlockListener implements Listener
 			event.setCancelled(true);
 			return;
 		}
-		//TODO validate
+		// validate
+		if (!plugin.getRootConfig().marketExists(marketName))
+		{
+			event.getPlayer().sendMessage(
+					ChatColor.RED + KarmicMarket.TAG + " Market '"
+							+ ChatColor.WHITE + marketName + ChatColor.RED
+							+ "' does not exist.");
+			event.setCancelled(true);
+			return;
+		}
 		// Reformat sign
 		event.setLine(0, marketName);
 		event.setLine(1, KarmicMarket.TAG);

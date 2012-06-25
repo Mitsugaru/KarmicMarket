@@ -18,7 +18,7 @@ public class RootConfig
 {
 	private KarmicMarket plugin;
 	private static final Map<String, PackageConfig> packages = new HashMap<String, PackageConfig>();
-	private final Map<String, MarketConfig> markets = new HashMap<String, MarketConfig>();
+	private static final Map<String, MarketConfig> markets = new HashMap<String, MarketConfig>();
 	public boolean debugTime, debugEconomy, needsChest;
 
 	public RootConfig(KarmicMarket plugin)

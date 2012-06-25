@@ -202,7 +202,9 @@ public class KMPlayerListener implements Listener
 		// Ignore if there is no package defined
 		if (packageName.equals(""))
 		{
-			// TODO nofity player
+			// nofity player
+			player.sendMessage(ChatColor.YELLOW + KarmicMarket.TAG
+					+ " No packages for this market...");
 			return;
 		}
 		// Generate market info object

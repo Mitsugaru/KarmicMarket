@@ -255,7 +255,7 @@ public class KMInventoryListener implements Listener
 					+ " No space available to purchase item...");
 			return;
 		}
-		if (!toCursor)
+		if (toCursor)
 		{
 			// Cancel
 			event.setCancelled(true);
