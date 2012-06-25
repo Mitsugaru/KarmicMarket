@@ -73,7 +73,7 @@ public class EconomyLogic
 			final int playerPoints = PlayerPointsAPI.look(player.getName());
 			if (pay < 0.0)
 			{
-				pay *= 1;
+				pay *= -1;
 				if (pay > playerPoints)
 				{
 					paid = true;

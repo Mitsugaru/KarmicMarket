@@ -41,11 +41,12 @@ public class KMBlockListener implements Listener
 		{
 			return;
 		}
-		if (PermissionHandler.has(event.getPlayer(), PermissionNode.SIGN))
+		if (!PermissionHandler.has(event.getPlayer(), PermissionNode.SIGN))
 		{
 			event.getPlayer().sendMessage(
 					ChatColor.RED + KarmicMarket.TAG + " Lack permission: "
 							+ PermissionNode.SIGN.getNode());
+			event.setCancelled(true);
 			return;
 		}
 		String marketName = null;
