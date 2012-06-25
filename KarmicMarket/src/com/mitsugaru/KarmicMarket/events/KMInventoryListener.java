@@ -12,6 +12,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.mitsugaru.KarmicMarket.KarmicMarket;
@@ -188,6 +189,23 @@ public class KMInventoryListener implements Listener
 			{
 				event.setCancelled(true);
 			}
+			else
+			{
+				// repopulate slot that they just took
+				final ItemStack restore = product.toItemStack();
+				restore.setAmount(event.getCurrentItem().getAmount());
+				if (!repopulate(holder.getInventory(), restore))
+				{
+					// Something went wrong
+					// notify
+					plugin.getLogger().warning(
+							"Could not schedule repopulate task on buyItem for "
+									+ player.getName() + " on item "
+									+ event.getCurrentItem().toString());
+					player.sendMessage(ChatColor.RED + KarmicMarket.TAG
+							+ " Something went wrong...");
+				}
+			}
 			if (finish)
 			{
 				return;
@@ -214,11 +232,7 @@ public class KMInventoryListener implements Listener
 			// repopulate slot that they just took
 			final ItemStack restore = product.toItemStack();
 			restore.setAmount(event.getCurrentItem().getAmount());
-			final Repopulate task = new Repopulate(event.getInventory(),
-					restore);
-			final int id = plugin.getServer().getScheduler()
-					.scheduleSyncDelayedTask(plugin, task, 1);
-			if (id == -1)
+			if (!repopulate(holder.getInventory(), restore))
 			{
 				// Something went wrong
 				// notify
@@ -250,6 +264,18 @@ public class KMInventoryListener implements Listener
 	private void sellItem(InventoryClickEvent event, boolean fromCursor)
 	{
 		plugin.getLogger().info("sell");
+	}
+
+	private boolean repopulate(Inventory inventory, ItemStack item)
+	{
+		final Repopulate task = new Repopulate(inventory, item);
+		final int id = plugin.getServer().getScheduler()
+				.scheduleSyncDelayedTask(plugin, task, 1);
+		if (id == -1)
+		{
+			return false;
+		}
+		return true;
 	}
 
 	private MarketInventoryHolder instanceCheck(InventoryEvent event)
