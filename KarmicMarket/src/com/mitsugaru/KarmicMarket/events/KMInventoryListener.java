@@ -158,7 +158,6 @@ public class KMInventoryListener implements Listener
 					event.setCancelled(true);
 					return;
 				}
-				event.setCancelled(true);
 			}
 			// Else, we handle it to go to their inventory
 		}
@@ -203,13 +202,14 @@ public class KMInventoryListener implements Listener
 		}
 		else
 		{
-			// Cancel
-			event.setCancelled(true);
+			
 			// notify that they have no space
 			player.sendMessage(ChatColor.YELLOW + KarmicMarket.TAG
 					+ " No space available to purchase item...");
 			return;
 		}
+		// Cancel
+		event.setCancelled(true);
 		// Pay for item
 		EconomyLogic.pay(player, price);
 	}
