@@ -136,43 +136,53 @@ public class KMInventoryListener implements Listener
 		}
 		if (toCursor)
 		{
-			boolean deny = false, finish = false;
+			boolean deny = false, finish = false, addCursor = false, same = false;
 			// Check cursor if its the same
 			if (!event.getCursor().getType().equals(Material.AIR))
 			{
 				final Item cursor = new Item(event.getCursor());
 				if (product.areSame(cursor))
 				{
+					addCursor = true;
 					deny = true;
 					finish = true;
+					same = true;
 				}
 			}
 			else
 			{
 				// let it go to their cursor
 				finish = true;
+				same = true;
 			}
-			// check if they can pay
-			if (!EconomyLogic.denyPay(player, price))
+			if (same)
 			{
-				// Pay for item
-				EconomyLogic.pay(player, price);
-				// Add to cursor
-				event.getCursor().setAmount(
-						event.getCursor().getAmount()
-								+ event.getCurrentItem().getAmount());
-				player.sendMessage(ChatColor.GREEN + KarmicMarket.TAG
-						+ " Bought " + ChatColor.AQUA
-						+ event.getCurrentItem().toString() + ChatColor.GREEN
-						+ " for " + ChatColor.GOLD + price * -1);
-			}
-			else
-			{
-				// denied
-				player.sendMessage(ChatColor.YELLOW + KarmicMarket.TAG
-						+ " Cannot pay " + ChatColor.GOLD + price * -1
-						+ ChatColor.YELLOW + " for " + ChatColor.AQUA
-						+ event.getCurrentItem().toString());
+				// check if they can pay
+				if (!EconomyLogic.denyPay(player, price))
+				{
+					// Pay for item
+					EconomyLogic.pay(player, price);
+					if (addCursor)
+					{
+						// Add to cursor
+						event.getCursor().setAmount(
+								event.getCursor().getAmount()
+										+ event.getCurrentItem().getAmount());
+					}
+					player.sendMessage(ChatColor.GREEN + KarmicMarket.TAG
+							+ " Bought " + ChatColor.AQUA
+							+ event.getCurrentItem().toString()
+							+ ChatColor.GREEN + " for " + ChatColor.GOLD
+							+ price * -1);
+				}
+				else
+				{
+					// denied
+					player.sendMessage(ChatColor.YELLOW + KarmicMarket.TAG
+							+ " Cannot pay " + ChatColor.GOLD + price * -1
+							+ ChatColor.YELLOW + " for " + ChatColor.AQUA
+							+ event.getCurrentItem().toString());
+				}
 			}
 			if (deny)
 			{
