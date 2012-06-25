@@ -103,6 +103,7 @@ public class KMInventoryListener implements Listener
 		{
 			if (event.getCurrentItem().getType().equals(Material.AIR))
 			{
+				event.setCancelled(true);
 				return;
 			}
 			else if (event.isLeftClick())
@@ -145,13 +146,13 @@ public class KMInventoryListener implements Listener
 								+ " Bought " + ChatColor.AQUA
 								+ event.getCurrentItem().toString()
 								+ ChatColor.GREEN + " for " + ChatColor.GOLD
-								+ price);
+								+ price * -1);
 					}
 					else
 					{
 						// denied
 						player.sendMessage(ChatColor.YELLOW + KarmicMarket.TAG
-								+ " Cannot pay " + ChatColor.GOLD + price
+								+ " Cannot pay " + ChatColor.GOLD + price * -1
 								+ ChatColor.YELLOW + " for " + ChatColor.AQUA
 								+ event.getCurrentItem().toString());
 					}
@@ -167,7 +168,7 @@ public class KMInventoryListener implements Listener
 		{
 			// Cannot pay
 			player.sendMessage(ChatColor.YELLOW + KarmicMarket.TAG
-					+ " Cannot pay " + ChatColor.GOLD + price
+					+ " Cannot pay " + ChatColor.GOLD + price * -1
 					+ ChatColor.YELLOW + " for " + ChatColor.AQUA
 					+ event.getCurrentItem().toString());
 			event.setCancelled(true);
@@ -181,7 +182,7 @@ public class KMInventoryListener implements Listener
 		{
 			// repopulate slot that they just took
 			final Repopulate task = new Repopulate(holder.getInventory(),
-					product.toItemStack());
+					event.getCurrentItem());
 			final int id = plugin.getServer().getScheduler()
 					.scheduleSyncDelayedTask(plugin, task, 1);
 			if (id == -1)
@@ -197,7 +198,7 @@ public class KMInventoryListener implements Listener
 			}
 			player.sendMessage(ChatColor.GREEN + KarmicMarket.TAG + " Bought "
 					+ ChatColor.AQUA + event.getCurrentItem().toString()
-					+ ChatColor.GREEN + " for " + ChatColor.GOLD + price);
+					+ ChatColor.GREEN + " for " + ChatColor.GOLD + price * -1);
 		}
 		else
 		{
