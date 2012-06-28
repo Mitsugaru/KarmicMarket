@@ -130,34 +130,42 @@ public class KMInventoryListener implements Listener {
 			if (event.getCursor().getAmount()
 				+ event.getCurrentItem().getAmount() > event
 				.getCurrentItem().getMaxStackSize()) {
+			    // FIXME
 			    // See if we can add the rest to their inventory
-			    final int rest = event.getCurrentItem().getAmount()
-				    - (event.getCurrentItem().getMaxStackSize() - event
-					    .getCurrentItem().getAmount());
-			    final ItemStack rem = (ItemStack) event
-				    .getCurrentItem().clone();
-			    rem.setAmount(rest);
-			    final HashMap<Integer, ItemStack> remaining = player
-				    .getInventory().addItem(rem);
-			    if (!remaining.isEmpty()) {
-				// They do not have enough space in their
-				// inventory
-				
-				for (Map.Entry<Integer, ItemStack> entry : remaining
-					.entrySet()) {
-				    if (rem.getType() == entry.getValue()
-					    .getType()) {
-					// remove what we did add
-					rem.setAmount(rem.getAmount()
-						- entry.getValue().getAmount());
-					player.getInventory().removeItem(rem);
-				    }
-				}
-			    } else {
-				// Set cursor to max stack
-				event.getCursor().setAmount(
-					event.getCursor().getMaxStackSize());
-			    }
+			    // final int rest =
+			    // event.getCurrentItem().getAmount()
+			    // - (event.getCurrentItem().getMaxStackSize() -
+			    // event
+			    // .getCurrentItem().getAmount());
+			    // final ItemStack rem = (ItemStack) event
+			    // .getCurrentItem().clone();
+			    // rem.setAmount(rest);
+			    //
+			    // final HashMap<Integer, ItemStack> remaining =
+			    // player
+			    // .getInventory().addItem(rem);
+			    // if (!remaining.isEmpty()) {
+			    // // They do not have enough space in their
+			    // // inventory
+			    //
+			    // for (Map.Entry<Integer, ItemStack> entry :
+			    // remaining
+			    // .entrySet()) {
+			    // if (rem.getType() == entry.getValue()
+			    // .getType()) {
+			    // // remove what we did add
+			    // rem.setAmount(rem.getAmount()
+			    // - entry.getValue().getAmount());
+			    // player.getInventory().removeItem(rem);
+			    // }
+			    // }
+			    // } else {
+			    // // Set cursor to max stack
+			    // event.getCursor().setAmount(
+			    // event.getCursor().getMaxStackSize());
+			    // }
+			    deny = false;
+			    finish = false;
 			} else {
 			    // Add to cursor
 			    event.getCursor().setAmount(
