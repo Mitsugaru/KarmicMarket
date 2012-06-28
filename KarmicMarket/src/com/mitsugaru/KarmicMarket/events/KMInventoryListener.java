@@ -216,7 +216,7 @@ public class KMInventoryListener implements Listener {
 	final MarketInventoryHolder holder = instanceCheck(event);
 	final Item product = new Item(event.getCurrentItem());
 	final Player player = (Player) event.getWhoClicked();
-	double price = 0.0;
+	double price = 1.0;
 	try {
 	    price *= holder.getMarketInfo().getItems()
 		    .get(event.getCurrentItem()).getAmount();
@@ -254,7 +254,8 @@ public class KMInventoryListener implements Listener {
 	    }
 	}
 	// Check if the item they are trying to sell is in their inventory.
-	if (player.getInventory().contains(event.getCurrentItem())) {
+	if (player.getInventory().contains(event.getCurrentItem().getType(),
+		event.getCurrentItem().getAmount())) {
 	    player.getInventory().removeItem(event.getCurrentItem());
 	    // Pay for item
 	    EconomyLogic.pay(player, price);
