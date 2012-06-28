@@ -19,7 +19,7 @@ public class MarketLogic {
 
     public static boolean buyItem(Player player, ItemStack product,
             MarketInfo market) {
-        double price = -1;
+        double price = -1.0;
         try {
             price *= market.getItems().get(product).getAmount();
         } catch (NullPointerException npe) {

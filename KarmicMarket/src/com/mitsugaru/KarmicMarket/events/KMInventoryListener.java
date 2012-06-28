@@ -1,6 +1,7 @@
 package com.mitsugaru.KarmicMarket.events;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -126,10 +127,44 @@ public class KMInventoryListener implements Listener {
 		    // Pay for item
 		    EconomyLogic.pay(player, price);
 		    if (addCursor) {
-			// Add to cursor
-			event.getCursor().setAmount(
-				event.getCursor().getAmount()
-					+ event.getCurrentItem().getAmount());
+			if (event.getCursor().getAmount()
+				+ event.getCurrentItem().getAmount() > event
+				.getCurrentItem().getMaxStackSize()) {
+			    // See if we can add the rest to their inventory
+			    final int rest = event.getCurrentItem().getAmount()
+				    - (event.getCurrentItem().getMaxStackSize() - event
+					    .getCurrentItem().getAmount());
+			    final ItemStack rem = (ItemStack) event
+				    .getCurrentItem().clone();
+			    rem.setAmount(rest);
+			    final HashMap<Integer, ItemStack> remaining = player
+				    .getInventory().addItem(rem);
+			    if (!remaining.isEmpty()) {
+				// They do not have enough space in their
+				// inventory
+				
+				for (Map.Entry<Integer, ItemStack> entry : remaining
+					.entrySet()) {
+				    if (rem.getType() == entry.getValue()
+					    .getType()) {
+					// remove what we did add
+					rem.setAmount(rem.getAmount()
+						- entry.getValue().getAmount());
+					player.getInventory().removeItem(rem);
+				    }
+				}
+			    } else {
+				// Set cursor to max stack
+				event.getCursor().setAmount(
+					event.getCursor().getMaxStackSize());
+			    }
+			} else {
+			    // Add to cursor
+			    event.getCursor().setAmount(
+				    event.getCursor().getAmount()
+					    + event.getCurrentItem()
+						    .getAmount());
+			}
 		    }
 		    player.sendMessage(ChatColor.GREEN + KarmicMarket.TAG
 			    + " Bought " + ChatColor.AQUA
@@ -178,8 +213,8 @@ public class KMInventoryListener implements Listener {
 	}
 
 	// Handle item going to inventory
-	final HashMap<Integer, ItemStack> remaining = event.getWhoClicked()
-		.getInventory().addItem(event.getCurrentItem());
+	final HashMap<Integer, ItemStack> remaining = player.getInventory()
+		.addItem(event.getCurrentItem());
 	if (remaining.isEmpty()) {
 	    // repopulate slot that they just took
 	    final ItemStack restore = product.toItemStack();
