@@ -7,22 +7,27 @@ import org.bukkit.inventory.ItemStack;
 
 import com.mitsugaru.KarmicMarket.config.PackageConfig;
 import com.mitsugaru.KarmicMarket.config.RootConfig;
+import com.mitsugaru.KarmicMarket.exceptions.MarketPackageNotFoundException;
 
 public class MarketInfo
 {
 	private String marketName, packageName;
 	private Map<ItemStack, ItemInfo> itemList = new HashMap<ItemStack, ItemInfo>();
 	
-	public MarketInfo(String marketName, String packageName)
+	public MarketInfo(String marketName, String packageName) throws MarketPackageNotFoundException
 	{
 		this.marketName = marketName;
 		this.packageName = packageName;
 		populateItemList();
 	}
 	
-	private void populateItemList()
+	private void populateItemList() throws MarketPackageNotFoundException
 	{
 		final PackageConfig pConfig = RootConfig.getPackageConfig(packageName);
+		if(pConfig == null)
+		{
+		    throw new MarketPackageNotFoundException(packageName, "Package '" + packageName + "' not found.");
+		}
 		for(Map.Entry<Item, ItemInfo> entry : pConfig.getItems().entrySet())
 		{
 			ItemStack item = entry.getKey().toItemStack();
