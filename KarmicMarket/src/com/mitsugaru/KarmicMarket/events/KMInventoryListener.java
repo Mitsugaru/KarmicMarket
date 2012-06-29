@@ -1,7 +1,6 @@
 package com.mitsugaru.KarmicMarket.events;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

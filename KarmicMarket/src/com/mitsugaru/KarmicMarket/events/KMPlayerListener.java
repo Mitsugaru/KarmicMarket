@@ -172,7 +172,7 @@ public class KMPlayerListener implements Listener {
 	    market = new MarketInfo(marketName, packageName);
 	} catch (MarketPackageNotFoundException e) {
 	    player.sendMessage(ChatColor.RED + KarmicMarket.TAG + " Package '"
-		    + ChatColor.GOLD + "' not found!");
+		    + ChatColor.GOLD + marketName + ChatColor.RED + "' not found!");
 	    return;
 	}
 	// See if the market inventory is already open
